@@ -53,6 +53,6 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
         <header-file src="src/ios/AEPMobile_PhoneGap.h" />
 		<source-file src="src/ios/AEPMobile_PhoneGap.m" />
-        <header-file src="src/ios/AEP-Plugin-Bridging-Header.h" />
+        <header-file src="src/ios/AEP-Bridging-Header.h" />
     </platform>
 </plugin>

@@ -43,8 +43,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
     <platform name="ios">
   
-        <pod name="ACPUserProfile" spec="~> 2.0" />
-        <pod name="ACPCore" spec="~> 2.0" />
+        <framework src="ACPUserProfile" type="podspec" spec="~> 2.0"/>
+        <framework src="ACPCore" type="podspec" spec="~> 2.0"/>
         <config-file parent="/*" target="config.xml">
             <feature name="AEPMobile_PhoneGap">
                 <param name="ios-package" value="AEPMobile_PhoneGap"/>

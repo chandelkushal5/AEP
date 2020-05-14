@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="cordova-plugin-adobe-aep" version="1.0.4"
+xmlns="http://apache.org/cordova/ns/plugins/1.0"
+xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>AEP Adobe Experience Platform</name>
+    <description>Plugin for Adobe Experience Platform</description>
+    <author>Kushal Chandel</author>
+
+    <license>MIT</license>
+
+    <engines>
+        <engine name="cordova" version=">=7.1.0" />
+        <engine name="cordova-android" version=">=7.0.0" />
+        <engine name="cordova-ios" version=">=4.5.0" />
+    </engines>
+
+    <js-module name="SalesforceSnapInsPlugin" src="www/AepPlugin.js">
+        <clobbers target="cordova.plugins.adobe"/>
+    </js-module>
+
+    <!-- <platform name="android">
+
+        <config-file parent="/*" target="res/xml/config.xml">
+            <feature name="SalesforceSnapInsPlugin">
+                <param name="android-package" value="org.apache.cordova.salesforce.SalesforceSnapInsPlugin" />
+                <param name="onload" value="true" />
+            </feature>
+        </config-file>
+
+        <config-file target="AndroidManifest.xml" parent="/manifest">
+            <uses-permission android:name="android.permission.INTERNET" />
+            <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+            <uses-permission android:name="android.permission.CAMERA" />
+        </config-file>
+
+
+
+        <source-file src="src/android/SalesforceSnapInsPlugin.java" target-dir="src/org/apache/cordova/salesforce" />
+        <source-file src="src/android/colors.xml" target-dir="src/res/values" />
+
+        <framework src="src/android/build.gradle" custom="true" type="gradleReference" />
+    </platform> -->
+
+    <platform name="ios">
+  
+        <pod name="ACPUserProfile" spec="~> 2.0" />
+        <pod name="ACPCore" spec="~> 2.0" />
+        <config-file parent="/*" target="config.xml">
+            <feature name="AEPMobile_PhoneGap">
+                <param name="ios-package" value="AEPMobile_PhoneGap"/>
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/AEPMobile_PhoneGap.h" />
+		<source-file src="src/ios/AEPMobile_PhoneGap.m" />
+        <header-file src="src/ios/Aep-Plugin-Bridging-Header.h" />
+    </platform>
+</plugin>

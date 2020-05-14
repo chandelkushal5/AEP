@@ -1,0 +1,44 @@
+{
+  "name": "cordova-plugin-adobe-aep",
+  "version": "0.0.1",
+  "description": "An Android Cordova plugin that allows users to display simple Toast messages at the bottom of the screen.",
+  "cordova": {
+    "id": "cordova-plugin-adobe-aep",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chandelkushal5/AEP.git"
+  },
+  "keywords": [
+    "Adobe Experience Platform Mobile SDKs",
+    "AEP",
+    "SDK",
+    "Adobe",
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=8.0.0"
+    },
+    {
+      "name": "cordova-android",
+      "version": ">=6.0.0"
+    },
+    {
+      "name": "cordova-ios",
+      "version": ">=4.5.0"
+    }
+  ],
+  "author": "Kushal Chandel<kushalchandel1992@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chandelkushal5/AEP/issues"
+  },
+  "homepage": "https://github.com/chandelkushal5/AEP"
+}

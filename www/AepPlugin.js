@@ -16,254 +16,254 @@
  * from Adobe Systems Incorporated.
  *
  **************************************************************************/
-var ADB = (function () {
-	var ADB = (typeof exports !== 'undefined') && exports || {};
+var AEP = (function () {
+	var AEP = (typeof exports !== 'undefined') && exports || {};
 
-	ADB.doNothing = function () {};
+	AEP.doNothing = function () {};
 
 	var PLUGIN_NAME = "AEPMobile_PhoneGap";
 
-	ADB.optedIn		= 1;
-	ADB.optedOut	= 2;
-	ADB.optUnknown	= 3;
+	AEP.optedIn		= 1;
+	AEP.optedOut	= 2;
+	AEP.optUnknown	= 3;
 
-	ADB.beaconUnknown	= 0;
-	ADB.beaconImmediate	= 1;
-	ADB.beaconNear		= 2;
-	ADB.beaconFar		= 3;
+	AEP.beaconUnknown	= 0;
+	AEP.beaconImmediate	= 1;
+	AEP.beaconNear		= 2;
+	AEP.beaconFar		= 3;
 
-	ADB.mobileVisitorAuthenticationStateUnknown			= 0;
-	ADB.mobileVisitorAuthenticationStateAuthenticated	= 1;
-	ADB.mobileVisitorAuthenticationStateLoggedOut		= 2;
+	AEP.mobileVisitorAuthenticationStateUnknown			= 0;
+	AEP.mobileVisitorAuthenticationStateAuthenticated	= 1;
+	AEP.mobileVisitorAuthenticationStateLoggedOut		= 2;
            
-	ADB.visitorID_idType = "idType";
-	ADB.visitorID_id = "id";
-	ADB.visitorID_authenticationState = "authenticationState";
+	AEP.visitorID_idType = "idType";
+	AEP.visitorID_id = "id";
+	AEP.visitorID_authenticationState = "authenticationState";
 
-	ADB.getVersion = function(success, fail) {
+	AEP.getVersion = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getVersion", []);
 	};
 
-	ADB.getPrivacyStatus = function(success, fail) {
+	AEP.getPrivacyStatus = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getPrivacyStatus", []);
 	};
 
-	ADB.setPrivacyStatus = function (privacyStatus, success, fail) {
+	AEP.setPrivacyStatus = function (privacyStatus, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "setPrivacyStatus", [privacyStatus]);
 	};
 
-	ADB.getLifetimeValue = function(success, fail) {
+	AEP.getLifetimeValue = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getLifetimeValue", []);
 	};
 
-	ADB.getUserIdentifier = function(success, fail) {
+	AEP.getUserIdentifier = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getUserIdentifier", []);
 	};
 
-	ADB.setUserIdentifier = function (userIdentifier, success, fail) {
+	AEP.setUserIdentifier = function (userIdentifier, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "setUserIdentifier", [userIdentifier]);
 	};
 
-	ADB.setPushIdentifier = function (pushIdentifier, success, fail) {
+	AEP.setPushIdentifier = function (pushIdentifier, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "setPushIdentifier", [pushIdentifier]);
 	};
 
-	ADB.getDebugLogging = function(success, fail) {
+	AEP.getDebugLogging = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getDebugLogging", []);
 	};
 
-	ADB.setDebugLogging = function(debugLogging, success, fail) {
+	AEP.setDebugLogging = function(debugLogging, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "setDebugLogging", [debugLogging]);
 	};
 
-	ADB.keepLifecycleSessionAlive = function(success, fail) {
+	AEP.keepLifecycleSessionAlive = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "keepLifecycleSessionAlive", []);
 	};
 
-	ADB.collectLifecycleData = function(success, fail) {
+	AEP.collectLifecycleData = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "collectLifecycleData", []);
 	};
 
-	ADB.collectPII = function(piiData, success, fail) {
+	AEP.collectPII = function(piiData, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "collectPII", [piiData]);
 	}
 
-	ADB.trackState = function(stateName, cData, success, fail) {
+	AEP.trackState = function(stateName, cData, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackState", [stateName, cData]);
 	};
 
-	ADB.trackAction = function(action, cData, success, fail) {
+	AEP.trackAction = function(action, cData, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackAction", [action, cData]);
 	};
 
-	ADB.trackActionFromBackground = function(action, cData, success, fail) {
+	AEP.trackActionFromBackground = function(action, cData, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackActionFromBackground", [action, cData]);
 	};
 
-	ADB.trackLocation = function(lat, long, cData, success, fail) {
+	AEP.trackLocation = function(lat, long, cData, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackLocation", [lat, long, cData]);
 	};
 
-	ADB.trackBeacon = function(uuid, major, minor, proximity, cData, success, fail) {
+	AEP.trackBeacon = function(uuid, major, minor, proximity, cData, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackBeacon", [uuid, major, minor, proximity, cData]);
 	};
 
-	ADB.clearCurrentBeacon = function(success, fail) {
+	AEP.clearCurrentBeacon = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackingClearCurrentBeacon", []);
 	};
 
-	ADB.trackAdobeDeepLink = function(deeplinkURL, success, fail) {
+	AEP.trackAdobeDeepLink = function(deeplinkURL, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackAdobeDeepLink", [deeplinkURL]);
 	}
 	
-	ADB.trackLifetimeValueIncrease = function(amount, cData, success, fail) {
+	AEP.trackLifetimeValueIncrease = function(amount, cData, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackLifetimeValueIncrease", [amount, cData]);
 	};
 
-	ADB.trackTimedActionStart = function(action, cData, success, fail) {
+	AEP.trackTimedActionStart = function(action, cData, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackTimedActionStart", [action, cData]);
 	};
 
-	ADB.trackTimedActionUpdate = function(action, cData, success, fail) {
+	AEP.trackTimedActionUpdate = function(action, cData, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackTimedActionUpdate", [action, cData]);
 	};
 
-	ADB.trackTimedActionEnd = function(action, success, fail) {
+	AEP.trackTimedActionEnd = function(action, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackTimedActionEnd", [action]);
 	};
 
-	ADB.trackingTimedActionExists = function(success, fail, action) {
+	AEP.trackingTimedActionExists = function(success, fail, action) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackingTimedActionExists", [action]);
 	};
 
-	ADB.trackingIdentifier = function(success, fail) {
+	AEP.trackingIdentifier = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackingIdentifier", []);
 	};
 
-	ADB.trackingSendQueuedHits = function() {
-		return cordova.exec(ADB.doNothing, ADB.doNothing, "AEPMobile_PhoneGap", "trackingSendQueuedHits", []);
+	AEP.trackingSendQueuedHits = function() {
+		return cordova.exec(AEP.doNothing, AEP.doNothing, "AEPMobile_PhoneGap", "trackingSendQueuedHits", []);
 	};
 
-	ADB.trackingClearQueue = function() {
-		return cordova.exec(ADB.doNothing, ADB.doNothing, "AEPMobile_PhoneGap", "trackingClearQueue", []);
+	AEP.trackingClearQueue = function() {
+		return cordova.exec(AEP.doNothing, AEP.doNothing, "AEPMobile_PhoneGap", "trackingClearQueue", []);
 	};
 
-	ADB.trackingGetQueueSize = function(success, fail) {
+	AEP.trackingGetQueueSize = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackingGetQueueSize", []);
 	};
 
-	ADB.targetLoadRequest = function(success, fail, name, defaultContent, parameters) {
+	AEP.targetLoadRequest = function(success, fail, name, defaultContent, parameters) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "targetLoadRequest", [name, defaultContent, parameters]);
 	};
 
-	ADB.targetLoadRequestWithName = function(success, fail, name, defaultContent, profileParameters, orderParameters, mboxParameters) {
+	AEP.targetLoadRequestWithName = function(success, fail, name, defaultContent, profileParameters, orderParameters, mboxParameters) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "targetLoadRequestWithName", [name, defaultContent, profileParameters, orderParameters, mboxParameters]);
 	}
 
-	ADB.targetLoadRequestWithNameWithLocationParameters = function(success, fail, name, defaultContent, profileParameters, orderParameters, mboxParameters, requestLocationParameters) {
+	AEP.targetLoadRequestWithNameWithLocationParameters = function(success, fail, name, defaultContent, profileParameters, orderParameters, mboxParameters, requestLocationParameters) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "targetLoadRequestWithNameWithLocationParameters", [name, defaultContent, profileParameters, orderParameters, mboxParameters, requestLocationParameters]);
 	}
 
-	ADB.targetSessionID = function(success, fail) {
+	AEP.targetSessionID = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "targetSessionID", []);
 	}
 
-	ADB.targetPcID = function(success, fail) {
+	AEP.targetPcID = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "targetPcID", []);
 	}
 
-	ADB.targetSetThirdPartyID = function(thirdPartyID, success, fail) {
+	AEP.targetSetThirdPartyID = function(thirdPartyID, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "targetSetThirdPartyID", [thirdPartyID]);
 	}
 
-	ADB.targetThirdPartyID = function(success, fail) {
+	AEP.targetThirdPartyID = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "targetThirdPartyID", []);
 	}
 
-	ADB.targetLoadOrderConfirmRequest = function(success, fail, name, orderId, orderTotal, productPurchaseId, parameters) {
+	AEP.targetLoadOrderConfirmRequest = function(success, fail, name, orderId, orderTotal, productPurchaseId, parameters) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "targetLoadOrderConfirmRequest", [name, orderId, orderTotal, productPurchaseId, parameters]);
 	};
 
-	ADB.targetClearCookies = function() {	
-		return cordova.exec(ADB.doNothing, ADB.doNothing, "AEPMobile_PhoneGap", "targetClearCookies", []);
+	AEP.targetClearCookies = function() {	
+		return cordova.exec(AEP.doNothing, AEP.doNothing, "AEPMobile_PhoneGap", "targetClearCookies", []);
 	};
 
-	ADB.acquisitionCampaignStartForApp = function(appId, data, success, fail) {
+	AEP.acquisitionCampaignStartForApp = function(appId, data, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "acquisitionCampaignStartForApp", [appId, data]);
 	};
 
-	ADB.audienceGetVisitorProfile = function(success, fail) {
+	AEP.audienceGetVisitorProfile = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "audienceGetVisitorProfile", []);
 	};
 
-	ADB.audienceGetDpuuid = function(success, fail) {
+	AEP.audienceGetDpuuid = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "audienceGetDpuuid", []);
 	};
 
-	ADB.audienceGetDpid = function(success, fail) {	
+	AEP.audienceGetDpid = function(success, fail) {	
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "audienceGetDpid", []);
 	};
 
-	ADB.audienceSetDpidAndDpuuid = function(dpid, dpuuid, success, fail) {
+	AEP.audienceSetDpidAndDpuuid = function(dpid, dpuuid, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "audienceSetDpidAndDpuuid", [dpid, dpuuid]);
 	};	
 
-	ADB.audienceSignalWithData = function(success, fail, data) {
+	AEP.audienceSignalWithData = function(success, fail, data) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "audienceSignalWithData", [data]);
 	};	
 
-	ADB.audienceReset = function() {	
-		return cordova.exec(ADB.doNothing, ADB.doNothing, "AEPMobile_PhoneGap", "audienceReset", []);
+	AEP.audienceReset = function() {	
+		return cordova.exec(AEP.doNothing, AEP.doNothing, "AEPMobile_PhoneGap", "audienceReset", []);
 	};
 
-	ADB.visitorAppendToURL = function(urlToAppend, success, fail) {
+	AEP.visitorAppendToURL = function(urlToAppend, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "visitorAppendToURL", [urlToAppend]);
 	}
 
-	ADB.visitorGetMarketingCloudId = function(success, fail) {
+	AEP.visitorGetMarketingCloudId = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "visitorGetMarketingCloudId", []);
 	};	
 
-	ADB.visitorSyncIdentifiers = function(identifiers, success, fail) {
+	AEP.visitorSyncIdentifiers = function(identifiers, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "visitorSyncIdentifiers", [identifiers]);
 	};
 
-	ADB.visitorSyncIdentifierWithType = function(identifierType, identifier, authenticationState, success, fail) {
+	AEP.visitorSyncIdentifierWithType = function(identifierType, identifier, authenticationState, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "visitorSyncIdentifierWithType", [identifierType, identifier, authenticationState]);
 	}
 
-	ADB.visitorSyncIdentifiersWithAuthenticationState = function(identifiers, authenticationState, success, fail) {
+	AEP.visitorSyncIdentifiersWithAuthenticationState = function(identifiers, authenticationState, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "visitorSyncIdentifiersWithAuthenticationState", [identifiers, authenticationState]);
 	}
           
-	ADB.visitorGetIDs = function(success, fail) {
+	AEP.visitorGetIDs = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "visitorGetIDs", []);
 	}
 
 	/*
 	*	iOS methods
 	*/
-	ADB.trackPushMessageClickthrough = function(userInfo, success, fail) {
+	AEP.trackPushMessageClickthrough = function(userInfo, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackPushMessageClickthrough", [userInfo]);
 	};
 	
-	ADB.setAppGroup = function(appGroup, success, fail) {
+	AEP.setAppGroup = function(appGroup, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "setAppGroup", [appGroup]);
 	};
 
-	ADB.syncSettings = function(settings, success, fail) {
+	AEP.syncSettings = function(settings, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "syncSettings", [settings]);
 	};
 
-	ADB.initializeWatch = function() {
-		return cordova.exec(ADB.doNothing, ADB.doNothing, "AEPMobile_PhoneGap", "initializeWatch", []);
+	AEP.initializeWatch = function() {
+		return cordova.exec(AEP.doNothing, AEP.doNothing, "AEPMobile_PhoneGap", "initializeWatch", []);
 	};
 
-	ADB.trackLocalNotificationClickThrough = function(userInfo, success, fail) {
+	AEP.trackLocalNotificationClickThrough = function(userInfo, success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackLocalNotificationClickThrough", [userInfo]);
 	}
 
-	return ADB;
+	return AEP;
 }());
 
-module.exports = ADB;
+module.exports = AEP;

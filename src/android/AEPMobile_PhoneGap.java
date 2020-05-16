@@ -84,7 +84,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
             this.trackState(args, callbackContext);
             return true;
         } else if (action.equals("trackAction")) {
-        //    this.trackAction(args, callbackContext);
+            this.trackAction(args, callbackContext);
             return true;
         } else if (action.equals("trackLocation")) {
            // this.trackLocation(args, callbackContext);

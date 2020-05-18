@@ -29,7 +29,10 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 
     <preference name="AEP_VERSION" default="1.+"/>
     <framework src="com.adobe.marketing.mobile:userprofile:$AEP_VERSION"/>
+    <framework src="com.adobe.marketing.mobile:campaign:$AEP_VERSION"/>
     <framework src="com.adobe.marketing.mobile:sdk-core:$AEP_VERSION"/>
+    <framework src="com.adobe.marketing.mobile:target:$AEP_VERSION"/>
+    <framework src="com.adobe.marketing.mobile:analytics:$AEP_VERSION"/>
 
      <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.INTERNET" />

@@ -14,11 +14,19 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         <engine name="cordova-ios" version=">=4.5.0" />
     </engines>
 
-    <js-module name="SalesforceSnapInsPlugin" src="www/AepPlugin.js">
-        <clobbers target="cordova.plugins.adobe"/>
-    </js-module>
+ <js-module src="www/AepPlugin.js" name="AEP">
+	    <clobbers target="AEP"/>
+	</js-module>
 
     <platform name="android">
+
+     <config-file target="res/xml/config.xml" parent="/*">
+			 <feature name="AEPMobile_PhoneGap">
+				 <param name="android-package" value="com.adobe.AEPMobile_PhoneGap" onload="true" />
+				 <param name="onload" value="true" />
+			 </feature>
+		 </config-file>
+
     <preference name="AEP_VERSION" default="1.+"/>
     <framework src="com.adobe.marketing.mobile:userprofile:$AEP_VERSION"/>
     <framework src="com.adobe.marketing.mobile:sdk-core:$AEP_VERSION"/>
@@ -33,6 +41,12 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     </platform>
 
     <platform name="ios">
+
+     <config-file target="config.xml" parent="/*">
+			 <feature name="AEPMobile_PhoneGap">
+				 <param name="ios-package" value="AEPMobile_PhoneGap" onload="true" />
+			 </feature>
+		 </config-file>
   
         <framework src="ACPUserProfile" type="podspec" spec="~> 2.0"/>
         <framework src="ACPCore" type="podspec" spec="~> 2.0"/>

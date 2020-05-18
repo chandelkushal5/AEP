@@ -197,8 +197,8 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
         } else if (action.equals("collectPII")) {
          //   this.collectPII(args,callbackContext);
             return true;
-        }else if (action.equals("initializeApp")) {
-               this.initializeApp(args,callbackContext);
+        }else if (action.equals("initializeAppAdobe")) {
+               this.initializeAppAdobe(args,callbackContext);
             return true;
         } else if (action.equals("trackAdobeDeepLink")){
         //    this.trackAdobeDeepLink(args,callbackContext);
@@ -208,7 +208,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
         return false;
     }
 
-    private void initializeApp(final JSONArray args, final CallbackContext callbackContext) {
+    private void initializeAppAdobe(final JSONArray args, final CallbackContext callbackContext) {
         cordova.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {

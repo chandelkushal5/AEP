@@ -40,8 +40,8 @@ var AEP = (function () {
 	AEP.visitorID_id = "id";
 	AEP.visitorID_authenticationState = "authenticationState";
 
-	AEP.initializeApp = function(action, success, fail) {
-		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "initializeApp", [action]);
+	AEP.initializeAppAdobe = function(action, success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "initializeAppAdobe", [action]);
 	};
 	
 	AEP.getVersion = function(success, fail) {

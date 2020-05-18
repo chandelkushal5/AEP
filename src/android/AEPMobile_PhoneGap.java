@@ -50,6 +50,9 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
     // =====================
     // public Method - all calls filter through this
     // =====================
+
+    String applicationCode = null;
+
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 //        Config.setContext(cordova.getActivity());
@@ -191,12 +194,49 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
         } else if (action.equals("collectPII")) {
          //   this.collectPII(args,callbackContext);
             return true;
+        }else if (action.equals("initialize")) {
+               this.initialize(args,callbackContext);
+            return true;
         } else if (action.equals("trackAdobeDeepLink")){
         //    this.trackAdobeDeepLink(args,callbackContext);
             return true;
         }
 
         return false;
+    }
+
+    private void initialize(final JSONArray args, final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+
+                try {
+                    if (!args.get(0).equals(null) && args.get(0).getClass() == String.class) {
+                        applicationCode = args.getString(0);
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                    return;
+                }
+                MobileCore.setApplication(MobileCore.getApplication());
+                MobileCore.setLogLevel(LoggingMode.DEBUG);
+
+                try {
+                    UserProfile.registerExtension();
+                    Identity.registerExtension();
+                    Lifecycle.registerExtension();
+                    Signal.registerExtension();
+                    if (applicationCode != null) {
+                        MobileCore.start(o -> MobileCore.configureWithAppID(applicationCode));
+                    }
+                } catch (InvalidInitException e) {
+
+                }
+                
+            }
+        });
     }
 
 

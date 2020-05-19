@@ -25,7 +25,9 @@
 #import "ACPIdentity.h"
 #import "ACPLifecycle.h"
 #import "ACPSignal.h"
-
+#import "ACPAnalytics.h"
+#import "ACPTarget.h"
+#import "ACPCampaign.h"
 #define STRING [NSString class]
 #define NUMBER [NSNumber class]
 #define DICTIONARY [NSDictionary class]
@@ -58,7 +60,6 @@ NSString *const VisitorId_AuthenticationState = @"authenticationState";
     [ACPAnalytics registerExtension];
     [ACPTarget registerExtension];
     [ACPCampaign registerExtension];
-    [ACPCampaignClassic registerExtension];
     const UIApplicationState appState = application.applicationState;
     [ACPCore start:^{
         // only start lifecycle if the application is not in the background

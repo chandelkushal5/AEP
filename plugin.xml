@@ -54,8 +54,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
         <framework src="ACPUserProfile" type="podspec" spec="~> 2.0"/>
         <framework src="ACPCore" type="podspec" spec="~> 2.0"/>
         <framework src="ACPAnalytics" type="podspec" spec="~> 2.0"/>
-        <framework src="ACPCampaign" type="podspec" spec="~> 1.0"/>    
-        <framework src="ACPCampaignClassic" type="podspec" spec="~> 2.0"/>    
+        <framework src="ACPCampaign" type="podspec" spec="~> 1.0"/>       
         <framework src="ACPTarget" type="podspec" spec="~> 2.0"/>   
 
 

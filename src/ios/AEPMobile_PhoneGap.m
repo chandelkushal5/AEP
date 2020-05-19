@@ -51,11 +51,14 @@ NSString *const VisitorId_AuthenticationState = @"authenticationState";
 -(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   [ACPCore setLogLevel:ACPMobileLogLevelDebug];
   [ACPCore configureWithAppId:@"<your_environment_id_from_Launch>"];
-  [ACPUserProfile registerExtension];
+    [ACPUserProfile registerExtension];
     [ACPIdentity registerExtension];
     [ACPLifecycle registerExtension];
     [ACPSignal registerExtension];
-
+    [ACPAnalytics registerExtension];
+    [ACPTarget registerExtension];
+    [ACPCampaign registerExtension];
+    [ACPCampaignClassic registerExtension];
     const UIApplicationState appState = application.applicationState;
     [ACPCore start:^{
         // only start lifecycle if the application is not in the background

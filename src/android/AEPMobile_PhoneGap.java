@@ -78,7 +78,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
           //  this.setUserIdentifier(args, callbackContext);
             return true;
         } else if (action.equals("setPushIdentifier")) {
-         //   this.setPushIdentifier(args, callbackContext);
+            this.setPushIdentifier(args, callbackContext);
             return true;
         } else if (action.equals("getDebugLogging")) {
            // this.getDebugLogging(callbackContext);
@@ -199,6 +199,9 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
             return true;
         }else if (action.equals("initializeAppAdobe")) {
                this.initializeAppAdobe(args,callbackContext);
+            return true;
+        }else if (action.equals("setLinkageFields")) {
+            this.setLinkageFields(args,callbackContext);
             return true;
         } else if (action.equals("trackAdobeDeepLink")){
         //    this.trackAdobeDeepLink(args,callbackContext);
@@ -322,6 +325,60 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
     }
 
 
+        private void setPushIdentifier(JSONArray args, final CallbackContext callbackContext) throws JSONException {
+        final String pushIdentifier = args.getString(0);
+
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                MobileCore.setPushIdentifier(pushIdentifier);
+                callbackContext.success();
+            }
+        });
+    }
+
+
+
+    private void setLinkageFields(final JSONArray args, final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                String action = null;
+                HashMap<String, String> cData = null;
+
+                try {
+                    // set appState if passed in
+                    if (!args.get(0).equals(null) && args.get(0).getClass() == String.class) {
+                        action = args.getString(0);
+                    } else if (!args.get(0).equals(null)) {
+                        // else set cData if it is passed in alone
+                        JSONObject cDataJSON = args.getJSONObject(0);
+                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
+                            cData = GetHashMapFromJSON(cDataJSON);
+                        }
+                    }
+                    // set cData if it is passed in along with action
+                    if (!args.get(1).equals(null)) {
+                        JSONObject cDataJSON = args.getJSONObject(1);
+                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
+                            cData = GetHashMapFromJSON(cDataJSON);
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                    return;
+                }
+
+                Campaign.setLinkageFields(cData);
+
+                callbackContext.success();
+            }
+        });
+    }
+
+
+
     // =====================
     // Analytics/Config Methods
     // =====================
@@ -414,17 +471,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
 //        });
 //    }
 //
-//    private void setPushIdentifier(JSONArray args, final CallbackContext callbackContext) throws JSONException {
-//        final String pushIdentifier = args.getString(0);
-//
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                Config.setPushIdentifier(pushIdentifier);
-//                callbackContext.success();
-//            }
-//        });
-//    }
+
 //
 //    private void getDebugLogging(final CallbackContext callbackContext) {
 //        cordova.getThreadPool().execute(new Runnable() {

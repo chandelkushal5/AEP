@@ -383,7 +383,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
 
 
 
-        private void targetLoadRequest(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+      private void targetLoadRequest(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
 
             String Mbox = args.getString(0);
             cordova.getThreadPool().execute(new Runnable() {

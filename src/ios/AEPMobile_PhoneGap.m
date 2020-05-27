@@ -28,6 +28,8 @@
 #import "ACPAnalytics.h"
 #import "ACPTarget.h"
 #import "ACPCampaign.h"
+#import "ACPTargetRequestObject.h"
+#import "ACPTargetPrefetchObject.h"
 #define STRING [NSString class]
 #define NUMBER [NSNumber class]
 #define DICTIONARY [NSDictionary class]
@@ -179,6 +181,65 @@ static BOOL checkArgsWithTypes(NSArray* arguments, NSArray* types) {
 
     return YES;
 }
+
+
+- (void)setPushIdentifier:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        if(!checkArgsWithTypes(command.arguments, @[@[STRING]])) {
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+            return;
+        }
+
+        NSString* pushIdStr = getArg(command.arguments[0]);
+        NSData* pushIdentifier = nil;
+
+        //hex NSString to NSData
+        if(pushIdStr != nil && [pushIdStr length]/2 == 32) {
+            char buffer[3];
+            buffer[2] = '\0';
+            char *bytes = malloc([pushIdStr length]/2);
+            char *bytes_ptr = bytes;
+            for (int i = 0; i < [pushIdStr length]; i += 2) {
+                buffer[0] = [pushIdStr characterAtIndex: i];
+                buffer[1] = [pushIdStr characterAtIndex: i+1];
+                char *b2 = NULL;
+                *bytes_ptr++ = strtol(buffer, &b2, 16);
+            }
+
+            pushIdentifier = [NSData dataWithBytesNoCopy:bytes length:[pushIdStr length]/2 freeWhenDone:YES];
+        }
+
+        [ACPCore setPushIdentifier:pushIdentifier];
+
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+    }];
+}
+
+
+- (void)setLinkageFields:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        if(!checkArgsWithTypes(command.arguments, @[@[STRING, DICTIONARY], @[STRING, DICTIONARY]])
+           || ([command.arguments[0] isKindOfClass:DICTIONARY] && command.arguments[1] != (id)[NSNull null])
+           || [command.arguments[1] isKindOfClass:STRING]) {
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+            return;
+        }
+
+       
+        id secondArg = getArg(command.arguments[1]);
+       [ACPCampaign setLinkageFields:secondArg];
+     
+
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+    }];
+}
+
+
+
+
+
+
+
 
 //- (void)getVersion:(CDVInvokedUrlCommand*)command {
 //	[self.commandDelegate runInBackground:^{

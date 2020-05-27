@@ -12,6 +12,9 @@ import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.Signal;
 import com.adobe.marketing.mobile.Target;
+import com.adobe.marketing.mobile.TargetParameters;
+import com.adobe.marketing.mobile.TargetRequest;
+
 import com.adobe.marketing.mobile.UserProfile;
 
 import android.os.Bundle;
@@ -27,6 +30,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 /*************************************************************************
@@ -129,7 +133,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
           //  this.trackingSendQueuedHits(callbackContext);
             return true;
         } else if (action.equals("targetLoadRequest")) {
-          //  this.targetLoadRequest(args, callbackContext);
+            this.targetLoadRequest(args, callbackContext);
             return true;
         } else if (action.equals("targetLoadRequestWithName")){
           //  this.targetLoadRequestWithName(args, callbackContext);
@@ -375,6 +379,45 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
                 callbackContext.success();
             }
         });
+    }
+
+
+
+        private void targetLoadRequest(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+
+            String Mbox = args.getString(0);
+            cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                
+                Map<String, String> mboxParameters1 = new HashMap<>();
+
+                TargetParameters parameters1 = new TargetParameters.Builder().parameters(mboxParameters1).build();
+                TargetRequest request1 = new TargetRequest(Mbox, parameters1, "defaultContent1",
+
+                        new AdobeCallback<String>() {
+
+                            @Override
+
+                            public void call(String value) {
+
+                                // do something with target content.
+
+                                callbackContext.success(value);
+
+                            }
+
+                        });
+
+                List<TargetRequest> locationRequests = new ArrayList<>();
+
+                locationRequests.add(request1);
+
+                Target.retrieveLocationContent(locationRequests, parameters1);
+
+            }
+        });
+
     }
 
 

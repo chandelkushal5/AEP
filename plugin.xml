@@ -51,11 +51,11 @@ xmlns:android="http://schemas.android.com/apk/res/android">
 			 </feature>
 		 </config-file>
   
-        <framework src="ACPUserProfile" type="podspec" spec="~> 2.0"/>
-        <framework src="ACPCore" type="podspec" spec="~> 2.0"/>
-        <framework src="ACPAnalytics" type="podspec" spec="~> 2.0"/>
-        <framework src="ACPCampaign" type="podspec" spec="~> 1.0"/>       
-        <framework src="ACPTarget" type="podspec" spec="~> 2.0"/>   
+       <framework src="ACPUserProfile" type="podspec" spec="~> 2.1"/>
+       <framework src="ACPCore" type="podspec" spec="~> 2.6"/>
+       <framework src="ACPAnalytics" type="podspec" spec="~> 2.2"/>
+       <framework src="ACPCampaign" type="podspec" spec="~> 1.0"/>       
+        <framework src="ACPTarget" type="podspec" spec="~> 2.1"/>  
 
 
         <config-file parent="/*" target="config.xml">

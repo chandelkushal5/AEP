@@ -215,30 +215,69 @@ static BOOL checkArgsWithTypes(NSArray* arguments, NSArray* types) {
     }];
 }
 
+- (void)collectPII:(CDVInvokedUrlCommand*)command{
 
-- (void)setLinkageFields:(CDVInvokedUrlCommand*)command {
     [self.commandDelegate runInBackground:^{
-        if(!checkArgsWithTypes(command.arguments, @[@[STRING, DICTIONARY], @[STRING, DICTIONARY]])
-           || ([command.arguments[0] isKindOfClass:DICTIONARY] && command.arguments[1] != (id)[NSNull null])
-           || [command.arguments[1] isKindOfClass:STRING]) {
+
+        if(!checkArgsWithTypes(command.arguments, @[@[DICTIONARY]])) {
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
             return;
         }
 
-       
-        id secondArg = getArg(command.arguments[1]);
-       [ACPCampaign setLinkageFields:secondArg];
-     
-
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+        NSDictionary *piiData = command.arguments[0];
+        //ToDo(Prerna): test for individual fields data type
+        [ACPCore collectPii:piiData];
+        CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:@"Collecting Pii"];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
     }];
 }
 
 
 
+- (void)targetLoadRequest:(CDVInvokedUrlCommand*)command {
+
+    [self.commandDelegate runInBackground:^{
+
+        if(!checkArgsWithTypes(command.arguments, @[@[STRING], @[STRING], @[DICTIONARY]]) )
+        {
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+            return;
+        }
+
+        NSString* name = getArg(command.arguments[0]);
+        
 
 
+        ACPTargetParameters *params1 = [ACPTargetParameters targetParametersWithParameters:nil
+                                                            profileParameters:nil
+                                                                      product:nil
+                                                                        order:nil];
+        ACPTargetRequestObject *request1 = [ACPTargetRequestObject targetRequestObjectWithName:name targetParameters:params1
+        defaultContent:@"defaultContent1" callback:^(NSString * _Nullable content) {
+            // do something with the received content
+                       CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:content];
+                       [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+          }];
 
+        
+        // Create request object array
+        NSArray *requestArray = @[request1];
+        ACPTargetParameters *targetParameters = [ACPTargetParameters targetParametersWithParameters:nil
+                                                            profileParameters:nil
+                                                                      product:nil
+                                                                        order:nil];
+
+        // Call the API
+        [ACPTarget retrieveLocationContent:requestArray withParameters:targetParameters];
+        
+        
+        
+        
+        
+       
+        
+    }];
+}
 
 
 //- (void)getVersion:(CDVInvokedUrlCommand*)command {

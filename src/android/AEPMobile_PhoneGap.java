@@ -199,7 +199,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
          //   this.visitorAppendToURL(args, callbackContext);
             return true;
         } else if (action.equals("collectPII")) {
-         //   this.collectPII(args,callbackContext);
+            this.collectPII(args,callbackContext);
             return true;
         }else if (action.equals("initializeAppAdobe")) {
                this.initializeAppAdobe(args,callbackContext);

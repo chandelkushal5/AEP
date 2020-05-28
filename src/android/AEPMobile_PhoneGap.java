@@ -204,10 +204,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
         }else if (action.equals("initializeAppAdobe")) {
                this.initializeAppAdobe(args,callbackContext);
             return true;
-        }else if (action.equals("setLinkageFields")) {
-            this.setLinkageFields(args,callbackContext);
-            return true;
-        } else if (action.equals("trackAdobeDeepLink")){
+        }else if (action.equals("trackAdobeDeepLink")){
         //    this.trackAdobeDeepLink(args,callbackContext);
             return true;
         }
@@ -343,29 +340,18 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
 
 
 
-    private void setLinkageFields(final JSONArray args, final CallbackContext callbackContext) {
-        cordova.getThreadPool().execute(new Runnable() {
+        private void collectPII(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
+
+        cordova.getThreadPool().execute((new Runnable() {
             @Override
             public void run() {
-                String action = null;
-                HashMap<String, String> cData = null;
+                HashMap<String, String> piiData = null;
 
                 try {
-                    // set appState if passed in
-                    if (!args.get(0).equals(null) && args.get(0).getClass() == String.class) {
-                        action = args.getString(0);
-                    } else if (!args.get(0).equals(null)) {
-                        // else set cData if it is passed in alone
-                        JSONObject cDataJSON = args.getJSONObject(0);
-                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
-                            cData = GetHashMapFromJSON(cDataJSON);
-                        }
-                    }
-                    // set cData if it is passed in along with action
-                    if (!args.get(1).equals(null)) {
-                        JSONObject cDataJSON = args.getJSONObject(1);
-                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
-                            cData = GetHashMapFromJSON(cDataJSON);
+                    if (!args.get(0).equals(null)) {
+                        JSONObject piiDataJSON = args.getJSONObject(0);
+                        if (!piiDataJSON.equals(null) && piiDataJSON.length() > 0) {
+                            piiData = GetHashMapFromJSON(piiDataJSON);
                         }
                     }
                 } catch (JSONException e) {
@@ -374,13 +360,15 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
                     return;
                 }
 
-                Campaign.setLinkageFields(cData);
-
+                MobileCore.collectPii(piiData);
                 callbackContext.success();
             }
-        });
-    }
+        }));
 
+    }
+    
+    
+    
 
 
       private void targetLoadRequest(final JSONArray args, final CallbackContext callbackContext) throws JSONException {

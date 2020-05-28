@@ -44,10 +44,6 @@ var AEP = (function () {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "initializeAppAdobe", [action]);
 	};
 
-	AEP.setLinkageFields = function(action, cData, success, fail) {
-		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "setLinkageFields", [action,cData]);
-	};
-	
 	AEP.getVersion = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getVersion", []);
 	};

@@ -49,14 +49,29 @@
 NSString *const VisitorId_Id = @"id";
 NSString *const VisitorId_IdType = @"idType";
 NSString *const VisitorId_AuthenticationState = @"authenticationState";
-
+NSString *const environmentID = @"0b11157d649c/a5066337cdf1/launch-50f50af43544-development";
 
 
 -(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   
+         [ACPCore setLogLevel:ACPMobileLogLevelDebug];
+            [ACPCore configureWithAppId:environmentID];
+              [ACPUserProfile registerExtension];
+              [ACPIdentity registerExtension];
+              [ACPLifecycle registerExtension];
+              [ACPSignal registerExtension];
+              [ACPAnalytics registerExtension];
+              [ACPTarget registerExtension];
+              [ACPCampaign registerExtension];
+              const UIApplicationState appState = [[UIApplication sharedApplication] applicationState];
+              [ACPCore start:^{
+                  // only start lifecycle if the application is not in the background
+                  if (appState != UIApplicationStateBackground) {
+                      [ACPCore lifecycleStart:nil];
+                  }
+              }];
     
-    
-  return YES;
+           return YES;
 }
 
 - (void) applicationWillEnterForeground:(UIApplication *)application {
@@ -65,43 +80,6 @@ NSString *const VisitorId_AuthenticationState = @"authenticationState";
 
 - (void) applicationDidEnterBackground:(UIApplication *)application {
    [ACPCore lifecyclePause];
-}
-
-
-
-- (void)initializeAppAdobe:(CDVInvokedUrlCommand*)command {
-//    [self.commandDelegate runInBackground:^{
-//        if(!checkArgsWithTypes(command.arguments, @[@[STRING, DICTIONARY], @[STRING, DICTIONARY]])
-//           || [command.arguments[0] isKindOfClass:DICTIONARY]) {
-//            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
-//            return;
-//        }
-
-        id firstArg = getArg(command.arguments[0]);
-     
-        [ACPCore setLogLevel:ACPMobileLogLevelDebug];
-        [ACPCore configureWithAppId:firstArg];
-          [ACPUserProfile registerExtension];
-          [ACPIdentity registerExtension];
-          [ACPLifecycle registerExtension];
-          [ACPSignal registerExtension];
-          [ACPAnalytics registerExtension];
-          [ACPTarget registerExtension];
-          [ACPCampaign registerExtension];
-//          [ACPCampaignClassic registerExtension];
-//          const UIApplicationState appState = application.applicationState;
-          const UIApplicationState appState = [[UIApplication sharedApplication] applicationState];
-          [ACPCore start:^{
-              // only start lifecycle if the application is not in the background
-              if (appState != UIApplicationStateBackground) {
-                  [ACPCore lifecycleStart:nil];
-              }
-          }];
-        
-        
-
-        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
-//    }];
 }
 
 

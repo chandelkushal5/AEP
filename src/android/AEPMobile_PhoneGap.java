@@ -58,7 +58,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
     // public Method - all calls filter through this
     // =====================
 
-    String applicationCode = null;
+    String applicationCode = "0b11157d649c/a5066337cdf1/launch-50f50af43544-development";
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
@@ -212,44 +212,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
         return false;
     }
 
-    private void initializeAppAdobe(final JSONArray args, final CallbackContext callbackContext) {
-        cordova.getThreadPool().execute(new Runnable() {
-            @Override
-            public void run() {
-
-                try {
-                    if (!args.get(0).equals(null) && args.get(0).getClass() == String.class) {
-                        applicationCode = args.getString(0);
-                    }
-
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                    callbackContext.error(e.getMessage());
-                    return;
-                }
-
-                MobileCore.setApplication(cordova.getActivity().getApplication());
-                MobileCore.setLogLevel(LoggingMode.DEBUG);
-
-                try {
-                    UserProfile.registerExtension();
-                    Identity.registerExtension();
-                    Lifecycle.registerExtension();
-                    Signal.registerExtension();
-                    Campaign.registerExtension();
-                    Analytics.registerExtension();
-                    Target.registerExtension();
-                    if (applicationCode != null) {
-                        MobileCore.start(o -> MobileCore.configureWithAppID(applicationCode));
-                    }
-                } catch (InvalidInitException e) {
-
-                }
-
-                callbackContext.success();
-            }
-        });
-    }
+   
 
 
     private void trackState(final JSONArray args, final CallbackContext callbackContext) {
@@ -1451,6 +1414,25 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
         super.initialize(cordova, webView);
 
+        MobileCore.setApplication(cordova.getActivity().getApplication());
+        MobileCore.setLogLevel(LoggingMode.DEBUG);
+
+        try {
+            UserProfile.registerExtension();
+            Identity.registerExtension();
+            Lifecycle.registerExtension();
+            Signal.registerExtension();
+            Campaign.registerExtension();
+            Analytics.registerExtension();
+            Target.registerExtension();
+            if (applicationCode != null) {
+                MobileCore.start(o -> MobileCore.configureWithAppID(applicationCode));
+            }
+        } catch (InvalidInitException e) {
+
+        }
+
+
     }
 
     @Override
@@ -1465,4 +1447,5 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
         MobileCore.setApplication(cordova.getActivity().getApplication());
         MobileCore.lifecycleStart(null);
     }
+
 }

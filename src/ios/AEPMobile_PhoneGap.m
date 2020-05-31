@@ -51,38 +51,47 @@ NSString *const VisitorId_IdType = @"idType";
 NSString *const VisitorId_AuthenticationState = @"authenticationState";
 NSString *const environmentID = @"0b11157d649c/a5066337cdf1/launch-50f50af43544-development";
 
-
--(BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
-  
-         [ACPCore setLogLevel:ACPMobileLogLevelDebug];
-            [ACPCore configureWithAppId:environmentID];
-              [ACPUserProfile registerExtension];
-              [ACPIdentity registerExtension];
-              [ACPLifecycle registerExtension];
-              [ACPSignal registerExtension];
-              [ACPAnalytics registerExtension];
-              [ACPTarget registerExtension];
-              [ACPCampaign registerExtension];
-              const UIApplicationState appState = [[UIApplication sharedApplication] applicationState];
-              [ACPCore start:^{
-                  // only start lifecycle if the application is not in the background
-                  if (appState != UIApplicationStateBackground) {
-                      [ACPCore lifecycleStart:nil];
-                  }
-              }];
+- (void)pluginInitialize {
+    [super pluginInitialize];
+    [ACPCore setLogLevel:ACPMobileLogLevelDebug];
+    [ACPCore configureWithAppId:environmentID];
+    [ACPUserProfile registerExtension];
+    [ACPIdentity registerExtension];
+    [ACPLifecycle registerExtension];
+    [ACPSignal registerExtension];
+    [ACPAnalytics registerExtension];
+    [ACPTarget registerExtension];
+    [ACPCampaign registerExtension];
+    const UIApplicationState appState = [[UIApplication sharedApplication] applicationState];
+    [ACPCore start:^{
+        // only start lifecycle if the application is not in the background
+        if (appState != UIApplicationStateBackground) {
+            [ACPCore lifecycleStart:nil];
+        }
+    }];
     
-           return YES;
+    //Become Active Notification
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidBecomeActive:) name:UIApplicationDidBecomeActiveNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appWillEnterForeground:) name:UIApplicationWillEnterForegroundNotification object:nil];
+    
+    //App moved to background
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(appDidEnterBackground:) name:UIApplicationWillResignActiveNotification object:nil];
 }
 
-- (void) applicationWillEnterForeground:(UIApplication *)application {
-    [ACPCore lifecycleStart:nil];
+- (void)appDidBecomeActive:(NSNotification *)notification {
+    NSLog(@"did become active notification");
+   
 }
 
-- (void) applicationDidEnterBackground:(UIApplication *)application {
-   [ACPCore lifecyclePause];
+- (void)appWillEnterForeground:(NSNotification *)notification {
+    NSLog(@"will enter foreground notification");
+     [ACPCore lifecycleStart:nil];
 }
 
-
+- (void)appDidEnterBackground:(NSNotification *)notification {
+    NSLog(@"Application enter background");
+     [ACPCore lifecyclePause];
+}
 
 - (void)trackState:(CDVInvokedUrlCommand*)command {
     [self.commandDelegate runInBackground:^{
@@ -1102,5 +1111,10 @@ static BOOL checkArgsWithTypes(NSArray* arguments, NSArray* types) {
 //}
 
 static id getArg(id argument) { return argument == (id)[NSNull null] ? nil : argument; }
+
+- (void)dealloc
+{
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+}
 
 @end

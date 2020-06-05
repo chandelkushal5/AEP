@@ -34,6 +34,8 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     <framework src="com.adobe.marketing.mobile:target:$AEP_VERSION"/>
     <framework src="com.adobe.marketing.mobile:analytics:$AEP_VERSION"/>
     <framework src="com.adobe.marketing.mobile:places:$AEP_VERSION"/>
+    <framework src="com.adobe.marketing.mobile:places-monitor:$AEP_VERSION"/>
+    <framework src="com.google.android.gms:play-services-location:16.0.0"/>
 
      <config-file target="AndroidManifest.xml" parent="/manifest">
       <uses-permission android:name="android.permission.INTERNET" />
@@ -58,7 +60,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
        <framework src="ACPCampaign" type="podspec" spec="~> 1.0"/>       
        <framework src="ACPTarget" type="podspec" spec="~> 2.1"/>  
        <framework src="ACPPlaces" type="podspec" spec="~> 1.3"/>  
-
+       <framework src="ACPPlacesMonitor" type="podspec" spec="~> 2.1"/>  
         <config-file parent="/*" target="config.xml">
             <feature name="AEPMobile_PhoneGap">
                 <param name="ios-package" value="AEPMobile_PhoneGap"/>

@@ -1,7 +1,7 @@
 package com.aep;
 
 import android.location.Location;
-import android.net.Uri;
+import org.apache.cordova.LOG;
 import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.Analytics;
 import com.adobe.marketing.mobile.Campaign;
@@ -10,14 +10,22 @@ import com.adobe.marketing.mobile.InvalidInitException;
 import com.adobe.marketing.mobile.Lifecycle;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.Places;
+import com.adobe.marketing.mobile.PlacesMonitor;
+import com.adobe.marketing.mobile.PlacesPOI;
 import com.adobe.marketing.mobile.Signal;
 import com.adobe.marketing.mobile.Target;
 import com.adobe.marketing.mobile.TargetParameters;
 import com.adobe.marketing.mobile.TargetRequest;
+import com.adobe.marketing.mobile.PlacesAuthorizationStatus;
+import com.adobe.marketing.mobile.PlacesRequestError;
 
+import java.util.List;
+import java.util.Iterator;
+import java.util.HashMap;
+import com.google.android.gms.location.Geofence;
 import com.adobe.marketing.mobile.UserProfile;
 
-import android.os.Bundle;
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -59,7 +67,32 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
     // =====================
 
     String applicationCode = "0b11157d649c/a5066337cdf1/launch-50f50af43544-development";
+    final static String METHOD_PLACESMONITOR_EXTENSION_VERSION_PLACESMONITOR = "extensionVersionMonitor";
+    final static String METHOD_PLACESMONITOR_START = "start";
+    final static String METHOD_PLACESMONITOR_STOP = "stop";
+    final static String METHOD_PLACESMONITOR_UPDATE_LOCATION = "updateLocation";
+    final static String METHOD_PLACESMONITOR_SET_PLACES_MONITOR_MODE = "setPlacesMonitorMode";
+    final static String METHOD_PLACES_CLEAR = "clear";
+    final static String METHOD_PLACES_EXTENSION_VERSION_PLACES = "extensionVersionPlaces";
+    final static String METHOD_PLACES_GET_CURRENT_POINTS_OF_INTEREST = "getCurrentPointsOfInterest";
+    final static String METHOD_PLACES_GET_LAST_KNOWN_LOCATION = "getLastKnownLocation";
+    final static String METHOD_PLACES_GET_NEARBY_POINTS_OF_INTEREST = "getNearbyPointsOfInterest";
+    final static String METHOD_PLACES_PROCESS_GEOFENCE = "processGeofence";
+    final static String METHOD_PLACES_SET_AUTHORIZATION_STATUS = "setAuthorizationStatus";
 
+    final static String LOG_TAG = "ACPPlaces_Cordova";
+
+    final static String POI = "POI";
+    final static String LATITUDE = "Latitude";
+    final static String LONGITUDE = "Longitude";
+    final static String LOWERCASE_LATITUDE = "latitude";
+    final static String LOWERCASE_LONGITUDE = "longitude";
+    final static String IDENTIFIER = "Identifier";
+    final static String RADIUS = "radius";
+    final static String REQUEST_ID = "requestId";
+    final static String CIRCULAR_REGION = "circularRegion";
+    final static String EXPIRATION_DURATION = "expirationDuration";
+    final static String PROVIDER = "cordova-plugin-geolocation";
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         //Config.setContext(cordova.getActivity());
@@ -203,6 +236,42 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
             return true;
         }else if (action.equals("initializeAppAdobe")) {
           //     this.initializeAppAdobe(args,callbackContext);
+            return true;
+        }else if (METHOD_PLACESMONITOR_SET_PLACES_MONITOR_MODE.equals(action)) {
+            setPlacesMonitorMode(callbackContext);
+            return true;
+        }else if (METHOD_PLACESMONITOR_EXTENSION_VERSION_PLACESMONITOR.equals(action)) {
+            extensionVersionMonitor(callbackContext);
+            return true;
+        } else if (METHOD_PLACESMONITOR_START.equals(action)) {
+            start(callbackContext);
+            return true;
+        } else if (METHOD_PLACESMONITOR_STOP.equals(action)) {
+            stop(args, callbackContext);
+            return true;
+        }else if (METHOD_PLACESMONITOR_UPDATE_LOCATION.equals(action)) {
+            updateLocation(callbackContext);
+            return true;
+        }else if (METHOD_PLACES_CLEAR.equals(action)) {
+            clear(callbackContext);
+            return true;
+        } else if (METHOD_PLACES_EXTENSION_VERSION_PLACES.equals((action))) {
+            extensionVersionPlaces(callbackContext);
+            return true;
+        } else if (METHOD_PLACES_GET_CURRENT_POINTS_OF_INTEREST.equals((action))) {
+            getCurrentPointsOfInterest(callbackContext);
+            return true;
+        }else if (METHOD_PLACES_GET_LAST_KNOWN_LOCATION.equals((action))) {
+            getLastKnownLocation(callbackContext);
+            return true;
+        } else if (METHOD_PLACES_GET_NEARBY_POINTS_OF_INTEREST.equals((action))) {
+            getNearbyPointsOfInterest(args, callbackContext);
+            return true;
+        } else if (METHOD_PLACES_PROCESS_GEOFENCE.equals((action))) {
+            processGeofence(args, callbackContext);
+            return true;
+        }else if (METHOD_PLACES_SET_AUTHORIZATION_STATUS.equals((action))) {
+            setAuthorizationStatus(args, callbackContext);
             return true;
         }else if (action.equals("trackAdobeDeepLink")){
         //    this.trackAdobeDeepLink(args,callbackContext);
@@ -371,997 +440,224 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
 
     }
 
+    private void extensionVersionMonitor(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                String extensionVersion = PlacesMonitor.extensionVersion();
+                if (extensionVersion.length() > 0) {
+                    callbackContext.success(extensionVersion);
+                } else {
+                    callbackContext.error("Extension version is null or empty");
+                }
+            }
+        });
+    }
+
+    private void start(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                PlacesMonitor.start();
+                callbackContext.success();
+            }
+        });
+    }
+
+    private void stop(final JSONArray args, final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                PlacesMonitor.stop();
+                callbackContext.success();
+            }
+        });
+    }
+
+    private void updateLocation(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                PlacesMonitor.updateLocation();
+                callbackContext.success();
+            }
+        });
+    }
 
 
-    // =====================
-    // Analytics/Config Methods
-    // =====================
-//    private void getVersion(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                String version = Config.getVersion();
-//                callbackContext.success(version);
-//            }
-//        });
-//    }
+    private void clear(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                Places.clear();
+                callbackContext.success();
+            }
+        });
+    }
 
-//    private void getPrivacyStatus(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                switch (Config.getPrivacyStatus()) {
-//                    case MOBILE_PRIVACY_STATUS_OPT_IN:
-//                        callbackContext.success("Opted In");
-//                        break;
-//                    case MOBILE_PRIVACY_STATUS_OPT_OUT:
-//                        callbackContext.success("Opted Out");
-//                        break;
-//                    case MOBILE_PRIVACY_STATUS_UNKNOWN:
-//                        callbackContext.success("Opt Unknown");
-//                        break;
-//                    default:
-//                        callbackContext.error("Privacy Status was an unknown value");
-//                }
-//            }
-//        });
-//    }
+    private void extensionVersionPlaces(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                String extensionVersion = Places.extensionVersion();
+                if (extensionVersion.length() > 0) {
+                    callbackContext.success(extensionVersion);
+                } else {
+                    callbackContext.error("Extension version is null or empty");
+                }
+            }
+        });
+    }
 
-//    private void setPrivacyStatus(JSONArray args, final CallbackContext callbackContext) throws JSONException {
-//        final int status = args.getInt(0);
-//
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                switch (status) {
-//                    case 1:
-//                        Config.setPrivacyStatus(MobilePrivacyStatus.MOBILE_PRIVACY_STATUS_OPT_IN);
-//                        callbackContext.success("Privacy status set to opted in");
-//                        break;
-//                    case 2:
-//                        Config.setPrivacyStatus(MobilePrivacyStatus.MOBILE_PRIVACY_STATUS_OPT_OUT);
-//                        callbackContext.success("Privacy status set to opted out");
-//                        break;
-//                    case 3:
-//                        Config.setPrivacyStatus(MobilePrivacyStatus.MOBILE_PRIVACY_STATUS_UNKNOWN);
-//                        callbackContext.success("Privacy status set to unknown");
-//                        break;
-//                    default:
-//                        callbackContext.error("Privacy Status was an unknown value");
-//                }
-//            }
-//        });
-//    }
-//
-//    private void getLifetimeValue(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                BigDecimal ltValue = Config.getLifetimeValue();
-//                callbackContext.success(ltValue.toString());
-//            }
-//        });
-//    }
-//
-//    private void getUserIdentifier(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                String UserIdentifier = Config.getUserIdentifier();
-//                callbackContext.success(UserIdentifier);
-//            }
-//        }));
-//    }
-//
-//    private void setUserIdentifier(JSONArray args, final CallbackContext callbackContext) throws JSONException {
-//        final String userIdentifier = args.getString(0);
-//
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                Config.setUserIdentifier(userIdentifier);
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
+    private void getCurrentPointsOfInterest(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                Places.getCurrentPointsOfInterest(new AdobeCallback<List<PlacesPOI>>() {
+                    @Override
+                    public void call(List<PlacesPOI> pois) {
+                        callbackContext.success(generatePOIString(pois));
+                    }
+                });
+            }
+        });
+    }
 
-//
-//    private void getDebugLogging(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                boolean debugLogging = Config.getDebugLogging();
-//                callbackContext.success(debugLogging ? "true" : "false");
-//            }
-//        });
-//    }
-//
-//    private void setDebugLogging(JSONArray args, final CallbackContext callbackContext) throws JSONException {
-//        final boolean status = args.getBoolean(0);
-//
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                Config.setDebugLogging(status);
-//                callbackContext.success("Set DebugLogging");
-//            }
-//        });
-//    }
-//
+    private void getLastKnownLocation(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                Places.getLastKnownLocation(new AdobeCallback<Location>() {
+                    @Override
+                    public void call(Location location) {
+                        if(location != null) {
+                            JSONObject json = new JSONObject();;
+                            try {
+                                json.put(LATITUDE, location.getLatitude());
+                                json.put(LONGITUDE, location.getLongitude());
+                            } catch (JSONException e){
+                                LOG.d(LOG_TAG, "Error putting data into JSON: " + e.getLocalizedMessage());
+                            }
+                            callbackContext.success(json.toString());
+                        } else {
+                            callbackContext.error("Error retrieving last known location.");
+                        }
+                    }
+                });
+            }
+        });
+    }
 
-//
-//    private void trackAction(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                String action = null;
-//                HashMap<String, Object> cData = null;
-//
-//                try {
-//                    // set appState if passed in
-//                    if (!args.get(0).equals(null) && args.get(0).getClass() == String.class) {
-//                        action = args.getString(0);
-//                    } else if (!args.get(0).equals(null)) {
-//                        // else set cData if it is passed in alone
-//                        JSONObject cDataJSON = args.getJSONObject(0);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
-//                            cData = GetHashMapFromJSON(cDataJSON);
-//                        }
-//                    }
-//                    // set cData if it is passed in along with action
-//                    if (!args.get(1).equals(null)) {
-//                        JSONObject cDataJSON = args.getJSONObject(1);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
-//                            cData = GetHashMapFromJSON(cDataJSON);
-//                        }
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                }
-//
-//                Analytics.trackAction(action, cData);
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    private void trackLocation(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                Location location = new Location("New Location");
-//                HashMap<String, Object> cData = null;
-//
-//                try {
-//                    location.setLatitude(Double.parseDouble(args.getString(0)));
-//                    location.setLongitude(Double.parseDouble(args.getString(1)));
-//
-//                    // set cData if it is passed in along with action
-//                    if (!args.get(2).equals(null)) {
-//                        JSONObject cDataJSON = args.getJSONObject(2);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0)
-//                            cData = GetHashMapFromJSON(cDataJSON);
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                } catch (NumberFormatException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                }
-//
-//                Analytics.trackLocation(location, cData);
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    private void trackBeacon(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    HashMap<String, Object> cData = null;
-//                    String uuid = args.getString(0);
-//                    String major = args.getString(1);
-//                    String minor = args.getString(2);
-//                    int proxInt = Integer.parseInt(args.getString(3));
-//                    Analytics.BEACON_PROXIMITY prox = proxInt >= 0 && proxInt < Analytics.BEACON_PROXIMITY.values().length ?
-//                            Analytics.BEACON_PROXIMITY.values()[proxInt] : Analytics.BEACON_PROXIMITY.values()[0];
-//
-//
-//                    // set cData if it is passed in along with action
-//                    if (!args.get(4).equals(null)) {
-//                        JSONObject cDataJSON = args.getJSONObject(4);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0)
-//                            cData = GetHashMapFromJSON(cDataJSON);
-//                    }
-//
-//                    Analytics.trackBeacon(uuid, major, minor, prox, cData);
-//                    callbackContext.success();
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                } catch (NumberFormatException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        });
-//    }
-//
-//    private void trackingClearCurrentBeacon(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                Analytics.clearBeacon();
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    private void trackLifetimeValueIncrease(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                BigDecimal amount = null;
-//                HashMap<String, Object> cData = null;
-//
-//                try {
-//                    amount = new BigDecimal(args.getString(0));
-//
-//                    // set cData
-//                    if (!args.get(1).equals(null)) {
-//                        JSONObject cDataJSON = args.getJSONObject(1);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
-//                            cData = GetHashMapFromJSON(cDataJSON);
-//                        }
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                } catch (NumberFormatException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                }
-//                Analytics.trackLifetimeValueIncrease(amount, cData);
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    private void trackTimedActionStart(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            String action = null;
-//            HashMap<String, Object> cData = null;
-//
-//            @Override
-//            public void run() {
-//                try {
-//                    // set appState if passed in
-//                    if (!args.get(0).equals(null) && args.get(0).getClass() == String.class) {
-//                        action = args.getString(0);
-//                    } else if (!args.get(0).equals(null)) {
-//                        // else set cData if it is passed in alone
-//                        JSONObject cDataJSON = args.getJSONObject(0);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
-//                            cData = GetHashMapFromJSON(cDataJSON);
-//                        }
-//                    }
-//
-//                    // set cData if it is passed in along with action
-//                    if (!args.get(1).equals(null)) {
-//                        JSONObject cDataJSON = args.getJSONObject(1);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
-//                            cData = GetHashMapFromJSON(cDataJSON);
-//                        }
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                }
-//                Analytics.trackTimedActionStart(action, cData);
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    private void trackTimedActionUpdate(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            String action = null;
-//            HashMap<String, Object> cData = null;
-//
-//            @Override
-//            public void run() {
-//                try {
-//                    // set appState if passed in
-//                    if (!args.get(0).equals(null) && args.get(0).getClass() == String.class) {
-//                        action = args.getString(0);
-//                    } else if (!args.get(0).equals(null)) {
-//                        // else set cData if it is passed in alone
-//                        JSONObject cDataJSON = args.getJSONObject(0);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0)
-//                            cData = GetHashMapFromJSON(cDataJSON);
-//                    }
-//                    // set cData if it is passed in along with action
-//                    if (!args.get(1).equals(null)) {
-//                        JSONObject cDataJSON = args.getJSONObject(1);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0)
-//                            cData = GetHashMapFromJSON(cDataJSON);
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                }
-//
-//                Analytics.trackTimedActionUpdate(action, cData);
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    private void trackingTimedActionExists(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-//        final String action = args.getString(0);
-//
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                boolean exists = Analytics.trackingTimedActionExists(action);
-//                callbackContext.success(exists ? "true" : "false");
-//            }
-//        });
-//    }
-//
-//    private void trackTimedActionEnd(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-//        final String action = args.getString(0);
-//
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                Analytics.trackTimedActionEnd(action, null);
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    private void trackingIdentifier(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                String trackingIdentifier = Analytics.getTrackingIdentifier();
-//                callbackContext.success(trackingIdentifier);
-//            }
-//        });
-//    }
-//
-//    private void trackingClearQueue(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                Analytics.clearQueue();
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    private void trackingGetQueueSize(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                long size = Analytics.getQueueSize();
-//                callbackContext.success(String.valueOf(size));
-//            }
-//        });
-//    }
-//
-//    private void trackingSendQueuedHits(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                Analytics.sendQueuedHits();
-//                callbackContext.success("Analytics: sent all hits in queue");
-//            }
-//        });
-//    }
+    private void getNearbyPointsOfInterest(final JSONArray args, final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (args == null || args.length() != 2) {
+                    callbackContext.error("Invalid argument count, expected 2 (location and limit).");
+                    return;
+                }
+                Location location = new Location(PROVIDER);
+                HashMap<String, String> locationMap;
+                int limit;
+                try {
+                    locationMap = getStringMapFromJSON(args.getJSONObject(0));
+                    limit = args.getInt(1);
+                } catch (JSONException e) {
+                    callbackContext.error("Error while parsing arguments, Error " + e.getLocalizedMessage());
+                    return;
+                }
 
-    // =====================
-    // Target
-    // =====================
-//    private void targetLoadRequest(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String name = args.getString(0);
-//                    String defaultContent = args.getString(1);
-//                    HashMap<String, Object> params = null;
-//
-//                    // set params
-//                    if (!args.get(2).equals(null)) {
-//                        JSONObject cDataJSON = args.getJSONObject(2);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
-//                            params = GetHashMapFromJSON(cDataJSON);
-//                        }
-//                    }
-//
-//                    TargetLocationRequest request = Target.createRequest(name, defaultContent, params);
-//
-//                    Target.loadRequest(request, new Target.TargetCallback<String>() {
-//                        @Override
-//                        public void call(String s) {
-//                            callbackContext.success(s);
-//                        }
-//                    });
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        });
-//    }
-//
-//    private void targetLoadOrderConfirmRequest(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                HashMap<String, Object> params = null;
-//                String name = null;
-//                String orderID = null;
-//                String orderTotal = null;
-//                String productPurchaseID = null;
-//
-//                try {
-//                    name = args.getString(0);
-//                    orderID = args.getString(1);
-//                    orderTotal = args.getString(2);
-//                    productPurchaseID = args.getString(3);
-//
-//                    // set params
-//                    if (!args.get(4).equals(null)) {
-//                        JSONObject cDataJSON = args.getJSONObject(4);
-//                        if (!cDataJSON.equals(null) && cDataJSON.length() > 0) {
-//                            params = GetHashMapFromJSON(cDataJSON);
-//                        }
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                }
-//
-//                TargetLocationRequest request = Target.createOrderConfirmRequest(name, orderID, orderTotal, productPurchaseID, params);
-//                Target.loadRequest(request, new Target.TargetCallback<String>() {
-//                    @Override
-//                    public void call(String s) {
-//                        callbackContext.success(s);
-//                    }
-//                });
-//            }
-//        });
-//    }
-//
-//    private void targetClearCookies(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                Target.clearCookies();
-//                callbackContext.success("Target: cleared cookies");
-//            }
-//        });
-//    }
-//
-//    // =====================
-//    // Acquisition
-//    // =====================
-//    private void acquisitionCampaignStartForApp(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                String appId = null;
-//                HashMap<String, Object> data = null;
-//                try {
-//                    if (!args.get(0).equals(null) && args.get(0).getClass() == String.class) {
-//                        appId = args.getString(0);
-//                    }
-//
-//                    if (!args.get(1).equals(null)) {
-//                        JSONObject dataJSON = args.getJSONObject(1);
-//                        if (!dataJSON.equals(null) && dataJSON.length() > 0) {
-//                            data = GetHashMapFromJSON(dataJSON);
-//                        }
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                }
-//
-//                Acquisition.campaignStartForApp(appId, data);
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    // =====================
-//    // Audience Manager
-//    // =====================
-//    private void audienceGetVisitorProfile(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                HashMap<String, Object> profile = AudienceManager.getVisitorProfile();
-//                callbackContext.success(profile == null ? new JSONObject() : new JSONObject(profile));
-//            }
-//        });
-//    }
-//
-//    private void audienceGetDpuuid(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                String dpuuid = AudienceManager.getDpuuid();
-//                callbackContext.success(dpuuid);
-//            }
-//        });
-//    }
-//
-//    private void audienceGetDpid(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                String dpid = AudienceManager.getDpid();
-//                callbackContext.success(dpid);
-//            }
-//        });
-//    }
-//
-//    private void audienceSetDpidAndDpuuid(JSONArray args, final CallbackContext callbackContext) throws JSONException {
-//        final String dpid = args.getString(0);
-//        final String dpuuid = args.getString(1);
-//
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                AudienceManager.setDpidAndDpuuid(dpid, dpuuid);
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    private void audienceSignalWithData(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    HashMap<String, Object> data = null;
-//
-//                    // set params
-//                    if (!args.get(0).equals(null)) {
-//                        JSONObject dataJSON = args.getJSONObject(0);
-//                        if (!dataJSON.equals(null) && dataJSON.length() > 0) {
-//                            data = GetHashMapFromJSON(dataJSON);
-//                        }
-//                    }
-//
-//                    AudienceManager.signalWithData(data, new AudienceManager.AudienceManagerCallback<Map<String, Object>>() {
-//                        @Override
-//                        public void call(Map response) {
-//                            callbackContext.success(response == null ? null : new JSONObject(response));
-//                        }
-//                    });
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        });
-//
-//    }
-//
-//    private void audienceReset(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                AudienceManager.reset();
-//                callbackContext.success("Audience manager reset");
-//            }
-//        });
-//    }
+                location.setLatitude(Double.parseDouble(locationMap.get(LOWERCASE_LATITUDE)));
+                location.setLongitude(Double.parseDouble(locationMap.get(LOWERCASE_LONGITUDE)));
+                Places.getNearbyPointsOfInterest(location, limit, new AdobeCallback<List<PlacesPOI>>() {
+                    @Override
+                    public void call(List<PlacesPOI> pois) {
+                        callbackContext.success(generatePOIString(pois));
+                    }
+                }, new AdobeCallback<PlacesRequestError>() {
+                    @Override
+                    public void call(PlacesRequestError placesRequestError) {
+                        callbackContext.error(placesRequestError.toString());
+                    }
+                });
+            }
+        });
+    }
 
-    // =====================
-    // VisitorID
-    // =====================
-//    private void visitorGetMarketingCloudId(final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                String visitorMCID = Visitor.getMarketingCloudId();
-//                callbackContext.success(visitorMCID);
-//            }
-//        });
-//    }
-//
-//    @SuppressWarnings("unchecked")
-//    private void visitorSyncIdentifiers(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute(new Runnable() {
-//            @Override
-//            public void run() {
-//                HashMap<String, Object> identifiers = null;
-//
-//                try {
-//                    if (!args.get(0).equals(null)) {
-//                        JSONObject identifiersJSON = args.getJSONObject(0);
-//                        if (!identifiersJSON.equals(null) && identifiersJSON.length() > 0) {
-//                            identifiers = GetHashMapFromJSON(identifiersJSON);
-//                        }
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                }
-//
-//                Map<String, String> ids = (Map) identifiers;
-//                Visitor.syncIdentifiers(ids);
-//                callbackContext.success();
-//            }
-//        });
-//    }
-//
-//    private void collectPII(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-//
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                HashMap<String, Object> piiData = null;
-//
-//                try {
-//                    if (!args.get(0).equals(null)) {
-//                        JSONObject piiDataJSON = args.getJSONObject(0);
-//                        if (!piiDataJSON.equals(null) && piiDataJSON.length() > 0) {
-//                            piiData = GetHashMapFromJSON(piiDataJSON);
-//                        }
-//                    }
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                    return;
-//                }
-//
-//                Config.collectPII(piiData);
-//                callbackContext.success();
-//            }
-//        }));
-//
-//    }
-//
-//    private void targetLoadRequestWithName(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String name = args.getString(0);
-//                    String defaultContent = args.getString(1);
-//
-//                    // set params
-//                    if (!args.get(2).equals(null) && !args.get(3).equals(null) && !args.get(4).equals(null)) {
-//
-//                        HashMap<String, Object> profileParameters = null;
-//                        HashMap<String, Object> orderParameters = null;
-//                        HashMap<String, Object> mboxParameters = null;
-//                        HashMap<String, Object> requestLocationParameters = null;
-//
-//                        JSONObject profileParametersJSON = args.getJSONObject(2);
-//                        if (!profileParametersJSON.equals(null) && profileParametersJSON.length() > 0) {
-//                            profileParameters = GetHashMapFromJSON(profileParametersJSON);
-//                        }
-//
-//                        JSONObject orderParametersJSON = args.getJSONObject(3);
-//                        if (!orderParametersJSON.equals(null) && orderParametersJSON.length() > 0) {
-//                            orderParameters = GetHashMapFromJSON(orderParametersJSON);
-//                        }
-//
-//                        JSONObject mboxParametersJSON = args.getJSONObject(4);
-//                        if ( !mboxParametersJSON.equals(null) && mboxParametersJSON.length() > 0) {
-//                            mboxParameters = GetHashMapFromJSON(mboxParametersJSON);
-//                        }
-//
-//                        Target.loadRequest(name,defaultContent,profileParameters,orderParameters,mboxParameters,new Target.TargetCallback<String>() {
-//                            @Override
-//                            public void call(String s) {
-//                                callbackContext.success(s);
-//                            }
-//                        });
-//                    }
-//                    else {
-//                        callbackContext.error("parameters cant be null");
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        }));
-//    }
-//
-//    private void targetLoadRequestWithNameWithLocationParameters(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String name = args.getString(0);
-//                    String defaultContent = args.getString(1);
-//
-//                    // set params
-//                    if (!args.get(2).equals(null) && !args.get(3).equals(null) && !args.get(4).equals(null) && !args.get(5).equals(null)) {
-//
-//                        HashMap<String, Object> profileParameters = null;
-//                        HashMap<String, Object> orderParameters = null;
-//                        HashMap<String, Object> mboxParameters = null;
-//                        HashMap<String, Object> requestLocationParameters = null;
-//
-//                        JSONObject profileParametersJSON = args.getJSONObject(2);
-//                        if (!profileParametersJSON.equals(null) && profileParametersJSON.length() > 0) {
-//                            profileParameters = GetHashMapFromJSON(profileParametersJSON);
-//                        }
-//
-//                        JSONObject orderParametersJSON = args.getJSONObject(3);
-//                        if (!orderParametersJSON.equals(null) && orderParametersJSON.length() > 0) {
-//                            orderParameters = GetHashMapFromJSON(orderParametersJSON);
-//                        }
-//
-//                        JSONObject mboxParametersJSON = args.getJSONObject(4);
-//                        if (!mboxParametersJSON.equals(null) && mboxParametersJSON.length() > 0) {
-//                            mboxParameters = GetHashMapFromJSON(mboxParametersJSON);
-//                        }
-//
-//                        JSONObject requestLocationParametersJSON = args.getJSONObject(5);
-//                        if (!requestLocationParametersJSON.equals(null) && requestLocationParametersJSON.length() > 0) {
-//                            requestLocationParameters = GetHashMapFromJSON(requestLocationParametersJSON);
-//                        }
-//
-//                        Target.loadRequest(name,defaultContent,profileParameters,orderParameters,mboxParameters,requestLocationParameters,new Target.TargetCallback<String>() {
-//                            @Override
-//                            public void call(String s) {
-//                                callbackContext.success(s);
-//                            }
-//                        });
-//                    }
-//                    else {
-//                        callbackContext.error("parameters cant be null");
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        }));
-//    }
-//
-//    private void targetSessionID(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                String sessionId = Target.getSessionID();
-//                callbackContext.success(sessionId);
-//            }
-//        }));
-//    }
-//
-//    private void targetPcID(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                String pcID = Target.getPcID();
-//                callbackContext.success(pcID);
-//            }
-//        }));
-//    }
-//
-//    private void targetSetThirdPartyID(final JSONArray args, final CallbackContext callbackContext) {
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String thirdPartyID = args.getString(0);
-//                    Target.setThirdPartyID(thirdPartyID);
-//                    callbackContext.success();
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        }));
-//    }
-//
-//    private void targetGetThirdPartyID(final JSONArray args, final CallbackContext callbackContext) {
-//
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                String thirdPartyID = Target.getThirdPartyID();
-//                callbackContext.success(thirdPartyID);
-//            }
-//        }));
-//    }
-//
-//    private void visitorSyncIdentifierWithType(final JSONArray args, final CallbackContext callbackContext) {
-//
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String identifierType = args.getString(0);
-//                    String identifier = args.getString(1);
-//                    int authenticationStateVal = args.getInt(2);
-//
-//                    if(authenticationStateVal >= 0 && authenticationStateVal <= 2){
-//                        VisitorID.VisitorIDAuthenticationState authenticationState = VisitorID.VisitorIDAuthenticationState.VISITOR_ID_AUTHENTICATION_STATE_UNKNOWN;
-//
-//                        switch (authenticationStateVal){
-//
-//                            case 0:
-//                                authenticationState = VisitorID.VisitorIDAuthenticationState.VISITOR_ID_AUTHENTICATION_STATE_UNKNOWN;
-//                                break;
-//                            case 1:
-//                                authenticationState = VisitorID.VisitorIDAuthenticationState.VISITOR_ID_AUTHENTICATION_STATE_AUTHENTICATED;
-//                                break;
-//                            case 2:
-//                                authenticationState = VisitorID.VisitorIDAuthenticationState.VISITOR_ID_AUTHENTICATION_STATE_LOGGED_OUT;
-//                                break;
-//                        }
-//
-//                        Visitor.syncIdentifier(identifierType, identifier, authenticationState);
-//                        callbackContext.success();
-//                    } else{
-//                        callbackContext.error("Invalid Authentication State");
-//                    }
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        }));
-//    }
-//
-//    private void visitorSyncIdentifiersWithAuthenticationState(final JSONArray args, final CallbackContext callbackContext) {
-//
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                Map<String, String> identifiers = null;
-//                VisitorID.VisitorIDAuthenticationState authenticationState = VisitorID.VisitorIDAuthenticationState.VISITOR_ID_AUTHENTICATION_STATE_UNKNOWN;
-//
-//                try {
-//                    if (!args.get(0).equals(null))
-//                    {
-//                        JSONObject identifiersJSON = args.getJSONObject(0);
-//
-//                        if (identifiersJSON != null && identifiersJSON.length() > 0)
-//                        {
-//                            identifiers = (Map) GetHashMapFromJSON(identifiersJSON);
-//                        }
-//                    }
-//
-//                    int authenticationStateVal = 0;
-//                    try {
-//                        authenticationStateVal = args.getInt(1);
-//
-//                        if(authenticationStateVal >= 0 && authenticationStateVal < 3) {
-//
-//                            switch (authenticationStateVal) {
-//
-//                                case 0:
-//                                    authenticationState = VisitorID.VisitorIDAuthenticationState.VISITOR_ID_AUTHENTICATION_STATE_UNKNOWN;
-//                                    break;
-//                                case 1:
-//                                    authenticationState = VisitorID.VisitorIDAuthenticationState.VISITOR_ID_AUTHENTICATION_STATE_AUTHENTICATED;
-//                                    break;
-//                                case 2:
-//                                    authenticationState = VisitorID.VisitorIDAuthenticationState.VISITOR_ID_AUTHENTICATION_STATE_LOGGED_OUT;
-//                                    break;
-//                            }
-//                        }
-//                    }
-//                    catch (JSONException e)
-//                    {
-//                        e.printStackTrace();
-//                        callbackContext.error(e.getMessage());
-//                        return;
-//                    }
-//
-//                    Visitor.syncIdentifiers(identifiers, authenticationState);
-//                    callbackContext.success();
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        }));
-//    }
-//
-//    private void visitorGetIDs(final JSONArray args, final CallbackContext callbackContext) {
-//
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                JSONArray visitorIDSJSONArray = null;
-//                try {
-//                    visitorIDSJSONArray = visitorGetIDsJSONArray();
-//                    if (visitorIDSJSONArray == null){
-//                        // returning success with null throws exception. Handle by sending empty array.
-//                        callbackContext.success(new JSONArray());
-//                    } else {
-//                        callbackContext.success(visitorIDSJSONArray);
-//                    }
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        }));
-//    }
-//
-//    private void visitorAppendToURL(final JSONArray args, final CallbackContext callbackContext) {
-//
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//
-//                try {
-//                    String urlToAppend = "";
-//                    if (!args.get(0).equals(null)){
-//                        urlToAppend = args.getString(0);
-//                    }
-//                    String finalURLString = Visitor.appendToURL(urlToAppend);
-//                    callbackContext.success(finalURLString);
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        }));
-//    }
-//
-//
-//    private void trackAdobeDeepLink(final JSONArray args, final CallbackContext callbackContext) throws JSONException {
-//
-//        cordova.getThreadPool().execute((new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    String deepLinkURL = "";
-//                    if (!args.get(0).equals(null)){
-//                        deepLinkURL = args.getString(0);
-//                    }
-//                    Config.trackAdobeDeepLink(Uri.parse(deepLinkURL));
-//                    callbackContext.success("track Adobe Link successful!");
-//
-//                } catch (JSONException e) {
-//                    e.printStackTrace();
-//                    callbackContext.error(e.getMessage());
-//                }
-//            }
-//        }));
-//    }
-//
+    private void processGeofence(final JSONArray args, final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (args == null || args.length() != 2) {
+                    callbackContext.error("Invalid argument count, expected 2 (geofence, transition type).");
+                    return;
+                }
+                int transitionType;
+                HashMap<String, Object> geofenceMap;
+                try {
+                    geofenceMap = getObjectMapFromJSON(args.getJSONObject(0));
+                    transitionType = args.getInt(1);
+                } catch (JSONException e) {
+                    callbackContext.error("Error while parsing argument, Error " + e.getLocalizedMessage());
+                    return;
+                }
+                String requestId = (String)geofenceMap.get(REQUEST_ID);
+                HashMap<String, String> circularRegion = getCircularRegionData((String)geofenceMap.get(CIRCULAR_REGION));
+                if(circularRegion == null) {
+                    callbackContext.error("Unable to get circular region data");
+                    return;
+                }
+                double latitude = Double.parseDouble(circularRegion.get(LOWERCASE_LATITUDE));
+                double longitude = Double.parseDouble(circularRegion.get(LOWERCASE_LONGITUDE));
+                float radius = Float.parseFloat(circularRegion.get(RADIUS));
+                long expirationDuration = Long.parseLong((String)geofenceMap.get(EXPIRATION_DURATION));
+                final Geofence geofence = new Geofence.Builder()
+                        .setCircularRegion(latitude, longitude, radius)
+                        .setExpirationDuration(expirationDuration)
+                        .setTransitionTypes(transitionType)
+                        .setRequestId(requestId)
+                        .build();
+                Places.processGeofence(geofence, transitionType);
+                callbackContext.success();
+            }
+        });
+    }
+
+    private void setAuthorizationStatus(final JSONArray args, final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                if (args == null || args.length() != 1) {
+                    callbackContext.error("Invalid argument count, expected 1 (status).");
+                    return;
+                }
+                PlacesAuthorizationStatus status;
+                try {
+                    status = getAuthorizationStatus(args.getInt(0));
+                } catch (JSONException e) {
+                    callbackContext.error("Error while parsing argument, Error " + e.getLocalizedMessage());
+                    return;
+                }
+
+                Places.setAuthorizationStatus(status);
+                callbackContext.success();
+            }
+        });
+    }
+
+
+
+    private void setPlacesMonitorMode(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                // TODO: this method is not implemented in Android
+                callbackContext.success();
+            }
+        });
+    }
+
+
     // =====================
     // Helpers
     // =====================
@@ -1382,6 +678,98 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
         table.putAll(map);
         return table;
     }
+
+
+    private HashMap<String, String> getStringMapFromJSON(JSONObject data) {
+        HashMap<String, String> map = new HashMap<String, String>();
+        @SuppressWarnings("rawtypes")
+        Iterator it = data.keys();
+        while (it.hasNext()) {
+            String n = (String) it.next();
+            try {
+                map.put(n, data.getString(n));
+            } catch (JSONException e) {
+                LOG.e(LOG_TAG, "JSON error: " + e.getLocalizedMessage());
+            }
+        }
+
+        return map;
+    }
+
+    private HashMap<String, Object> getObjectMapFromJSON(JSONObject data) {
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        @SuppressWarnings("rawtypes")
+        Iterator it = data.keys();
+        while (it.hasNext()) {
+            String n = (String) it.next();
+            try {
+                map.put(n, data.getString(n));
+            } catch (JSONException e) {
+                LOG.d(LOG_TAG, "JSON error: " + e.getLocalizedMessage());
+            }
+        }
+
+        return map;
+    }
+
+    private PlacesAuthorizationStatus getAuthorizationStatus(final int status){
+        if(status == 0) {
+            return  PlacesAuthorizationStatus.DENIED;
+        } else if(status == 1) {
+            return PlacesAuthorizationStatus.ALWAYS;
+        } else if(status == 2) {
+            return PlacesAuthorizationStatus.UNKNOWN;
+        } else if(status == 3) {
+            return PlacesAuthorizationStatus.RESTRICTED;
+        } else if(status == 4) {
+            return PlacesAuthorizationStatus.WHEN_IN_USE;
+        } else {
+            return null;
+        }
+    }
+
+    private HashMap<String, String> getCircularRegionData(final String regionData) {
+        JSONObject json = null;
+
+        try {
+            json = new JSONObject(regionData);
+            HashMap<String, String> regionDataMap = new HashMap<>();
+            @SuppressWarnings("unchecked")
+            Iterator<String> it = json.keys();
+            while(it.hasNext()) {
+                String name = it.next();
+                regionDataMap.put(name, json.getString(name));
+            }
+            return regionDataMap;
+        } catch (JSONException e) {
+            LOG.e(LOG_TAG, "Error converting regionData string to Map: " + e.getLocalizedMessage());
+            return null;
+        }
+
+    }
+
+    private String generatePOIString(final List<PlacesPOI> pois) {
+        JSONArray jsonArray = new JSONArray();
+        JSONObject json;
+        if (!pois.isEmpty()) {
+            for (int index = 0; index < pois.size(); index++) {
+                try {
+                    PlacesPOI poi = pois.get(index);
+                    json = new JSONObject();
+                    json.put(POI, poi.getName());
+                    json.put(LATITUDE, poi.getLatitude());
+                    json.put(LONGITUDE, poi.getLongitude());
+                    json.put(IDENTIFIER, poi.getIdentifier());
+                    jsonArray.put(index, json);
+                } catch (JSONException e) {
+                    LOG.d(LOG_TAG, "Error putting data into JSON: " + e.getLocalizedMessage());
+                }
+            }
+        }
+        return jsonArray.toString();
+    }
+
+
 //
 //    private JSONArray visitorGetIDsJSONArray() {
 //        ArrayList<Object> visitoIDsJson = new ArrayList<Object>();
@@ -1425,8 +813,27 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
             Campaign.registerExtension();
             Analytics.registerExtension();
             Target.registerExtension();
+            PlacesMonitor.registerExtension(); //Register PlacesMonitor with Mobile Core
+            Places.registerExtension(); //Register Places with Mobile Core
+            MobileCore.start(null);
+            PlacesMonitor.start();//Start monitoring the geo-fences
             if (applicationCode != null) {
-                MobileCore.start(o -> MobileCore.configureWithAppID(applicationCode));
+//                MobileCore.start(o -> MobileCore.configureWithAppID(applicationCode));
+                MobileCore.start(new AdobeCallback() {
+                    @Override
+                    public void call(Object o) {
+                        // switch to your App ID from Launch
+                        MobileCore.configureWithAppID(applicationCode);
+
+                        final Map<String, Object> config = new HashMap<>();
+                        config.put("places.membershipttl", 30);
+                        MobileCore.updateConfiguration(config);
+
+                        MobileCore.lifecycleStart(null);
+                    }
+                });
+
+
             }
         } catch (InvalidInitException e) {
 

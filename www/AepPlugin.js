@@ -267,6 +267,45 @@ var AEP = (function () {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "trackLocalNotificationClickThrough", [userInfo]);
 	}
 
+	AEP.extensionVersionPlaces = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "extensionVersionPlaces", []);
+	}
+
+	AEP.getCurrentPointsOfInterest = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getCurrentPointsOfInterest", []);
+	}
+
+	AEP.getLastKnownLocation = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getLastKnownLocation", []);
+	}
+
+	AEP.getNearbyPointsOfInterest = function(location, limit, success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getNearbyPointsOfInterest", [location, limit]);
+	}
+
+	AEP.processGeofence = function(geofence, transitionType, success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getNearbyPointsOfInterest", [geofence, transitionType]);
+	}
+
+	AEP.setAuthorizationStatus = function(status, success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getNearbyPointsOfInterest", [status]);
+	}
+
+	AEP.extensionVersionMonitor = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "extensionVersionMonitor", []);
+	}
+
+	AEP.start = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "start", []);
+	}
+	AEP.stop = function(shouldClearData,success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "stop", [shouldClearData]);
+	}
+
+	AEP.updateLocation = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "updateLocation", []);
+	}
+
 	return AEP;
 }());
 

@@ -815,8 +815,6 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
             Target.registerExtension();
             PlacesMonitor.registerExtension(); //Register PlacesMonitor with Mobile Core
             Places.registerExtension(); //Register Places with Mobile Core
-            MobileCore.start(null);
-            PlacesMonitor.start();//Start monitoring the geo-fences
             if (applicationCode != null) {
 //                MobileCore.start(o -> MobileCore.configureWithAppID(applicationCode));
                 MobileCore.start(new AdobeCallback() {

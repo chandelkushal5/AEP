@@ -305,6 +305,15 @@ var AEP = (function () {
 	AEP.updateLocation = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "updateLocation", []);
 	}
+	AEP.extensionVersion = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "extensionVersion", []);
+	}
+	AEP.extensionVersion = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "extensionVersion", []);
+	}
+	AEP.getSdkIdentities = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getSdkIdentities", []);
+	}
 
 	return AEP;
 }());

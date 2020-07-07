@@ -93,6 +93,8 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
     final static String CIRCULAR_REGION = "circularRegion";
     final static String EXPIRATION_DURATION = "expirationDuration";
     final static String PROVIDER = "cordova-plugin-geolocation";
+    final static String METHOD_CORE_GET_SDK_IDENTITIES = "getSdkIdentities";
+    final static String METHOD_CORE_EXTENSION_VERSION_CORE = "extensionVersion";
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
         //Config.setContext(cordova.getActivity());
@@ -272,6 +274,12 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
             return true;
         }else if (METHOD_PLACES_SET_AUTHORIZATION_STATUS.equals((action))) {
             setAuthorizationStatus(args, callbackContext);
+            return true;
+        }else if (METHOD_CORE_GET_SDK_IDENTITIES.equals((action))) {
+            getSdkIdentities(callbackContext);
+            return true;
+        }else if (METHOD_CORE_EXTENSION_VERSION_CORE.equals((action))) {
+            extensionVersion(callbackContext);
             return true;
         }else if (action.equals("trackAdobeDeepLink")){
         //    this.trackAdobeDeepLink(args,callbackContext);
@@ -468,11 +476,39 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
         cordova.getThreadPool().execute(new Runnable() {
             @Override
             public void run() {
-                PlacesMonitor.stop();
+                PlacesMonitor.stop(true);
                 callbackContext.success();
             }
         });
     }
+
+
+    private void extensionVersion(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                final String version = MobileCore.extensionVersion();
+                callbackContext.success(version);
+            }
+        });
+    }
+
+
+    private void getSdkIdentities(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                MobileCore.getSdkIdentities(new AdobeCallback<String>() {
+                    @Override
+                    public void call(String s) {
+                        callbackContext.success(s);
+                    }
+                });
+            }
+        });
+    }
+
+
 
     private void updateLocation(final CallbackContext callbackContext) {
         cordova.getThreadPool().execute(new Runnable() {
@@ -483,6 +519,11 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
             }
         });
     }
+
+
+
+
+
 
 
     private void clear(final CallbackContext callbackContext) {

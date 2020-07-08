@@ -80,5 +80,16 @@ FOUNDATION_EXPORT NSString *const VisitorId_AuthenticationState;
 - (void)visitorSyncIdentifierWithType:(CDVInvokedUrlCommand*)command;
 - (void)visitorAppendToURL:(CDVInvokedUrlCommand*)command;
 - (void)visitorGetIDs:(CDVInvokedUrlCommand*)command;
-
+- (void)extensionVersion:(CDVInvokedUrlCommand*)command;
+- (void)start:(CDVInvokedUrlCommand*)command;
+- (void)stop:(CDVInvokedUrlCommand*)command;
+- (void)updateLocation:(CDVInvokedUrlCommand*)command;
+- (void)setRequestLocationPermission:(CDVInvokedUrlCommand*)command;
+- (void)setPlacesMonitorMode:(CDVInvokedUrlCommand*)command;
+- (void)clear:(CDVInvokedUrlCommand*)command;
+- (void)getCurrentPointsOfInterest:(CDVInvokedUrlCommand*)command;
+- (void)getLastKnownLocation:(CDVInvokedUrlCommand*)command;
+- (void)getNearbyPointsOfInterest:(CDVInvokedUrlCommand*)command;
+- (void)processGeofence:(CDVInvokedUrlCommand*)command;
+- (void)setAuthorizationStatus:(CDVInvokedUrlCommand*)command;
 @end

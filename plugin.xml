@@ -34,7 +34,7 @@ xmlns:android="http://schemas.android.com/apk/res/android">
     <framework src="com.adobe.marketing.mobile:target:$AEP_VERSION"/>
     <framework src="com.adobe.marketing.mobile:analytics:$AEP_VERSION"/>
     <framework src="com.adobe.marketing.mobile:places:$AEP_VERSION"/>
-    <framework src="com.adobe.marketing.mobile:places-monitor:$AEP_VERSION"/>
+    <framework src="com.adobe.marketing.mobile:places-monitor:2.+"/>
     <framework src="com.google.android.gms:play-services-location:16.0.0"/>
 
      <config-file target="AndroidManifest.xml" parent="/manifest">

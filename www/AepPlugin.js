@@ -314,6 +314,12 @@ var AEP = (function () {
 	AEP.getSdkIdentities = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getSdkIdentities", []);
 	}
+	AEP.getIdentifiers = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getIdentifiers", []);
+	}
+	AEP.getUrlVariables = function(success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getUrlVariables", []);
+	}
 
 	return AEP;
 }());

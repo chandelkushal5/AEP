@@ -32,6 +32,7 @@
 #import "ACPTargetPrefetchObject.h"
 #import <ACPPlacesMonitor/ACPPlacesMonitor.h>
 #import <ACPPlaces/ACPPlaces.h>
+#import <ACPCore/ACPIdentity.h>
 #define STRING [NSString class]
 #define NUMBER [NSNumber class]
 #define DICTIONARY [NSDictionary class]
@@ -75,8 +76,11 @@ static NSString * const EMPTY_ARRAY_STRING = @"[]";
     [ACPAnalytics registerExtension];
     [ACPTarget registerExtension];
     [ACPCampaign registerExtension];
+    [ACPPlaces registerExtension];
+    [ACPPlacesMonitor registerExtension];
     const UIApplicationState appState = [[UIApplication sharedApplication] applicationState];
     [ACPCore start:^{
+     [ACPCore updateConfiguration:@{@"places.membershipttl":@(30)}];
         // only start lifecycle if the application is not in the background
         if (appState != UIApplicationStateBackground) {
             [ACPCore lifecycleStart:nil];
@@ -504,7 +508,33 @@ static BOOL checkArgsWithTypes(NSArray* arguments, NSArray* types) {
     }];
 }
 
+- (void) getIdentifiers:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        [ACPIdentity getIdentifiers:^(NSArray<ACPMobileVisitorId *> * _Nullable visitorIDs) {
+            NSString *visitorIdsString = @"";
+            if (!visitorIDs) {
+                visitorIdsString = @"nil";
+            } else if ([visitorIDs count] == 0) {
+                visitorIdsString = @"[]";
+            } else {
+                for (ACPMobileVisitorId *visitorId in visitorIDs) {
+                    visitorIdsString = [visitorIdsString stringByAppendingFormat:@"[Id: %@, Type: %@, Origin: %@, Authentication: %@] ", [visitorId identifier], [visitorId idType], [visitorId idOrigin], stateStrings[(unsigned long)[visitorId authenticationState]]];
+                }
+            }
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:visitorIdsString];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }];
+    }];
+}
 
+- (void) getUrlVariables:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        [ACPIdentity getUrlVariables:^(NSString * _Nullable urlVariables) {
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:urlVariables];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }];
+    }];
+}
 
 
 //- (void)getVersion:(CDVInvokedUrlCommand*)command {

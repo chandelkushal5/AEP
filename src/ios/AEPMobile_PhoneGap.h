@@ -92,4 +92,6 @@ FOUNDATION_EXPORT NSString *const VisitorId_AuthenticationState;
 - (void)getNearbyPointsOfInterest:(CDVInvokedUrlCommand*)command;
 - (void)processGeofence:(CDVInvokedUrlCommand*)command;
 - (void)setAuthorizationStatus:(CDVInvokedUrlCommand*)command;
+- (void) getIdentifiers:(CDVInvokedUrlCommand*)command;
+- (void) getUrlVariables:(CDVInvokedUrlCommand*)command;
 @end

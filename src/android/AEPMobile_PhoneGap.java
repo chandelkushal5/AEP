@@ -19,7 +19,7 @@ import com.adobe.marketing.mobile.TargetParameters;
 import com.adobe.marketing.mobile.TargetRequest;
 import com.adobe.marketing.mobile.PlacesAuthorizationStatus;
 import com.adobe.marketing.mobile.PlacesRequestError;
-
+import com.adobe.marketing.mobile.VisitorID;
 import java.util.List;
 import java.util.Iterator;
 import java.util.HashMap;
@@ -281,7 +281,13 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
         }else if (METHOD_CORE_EXTENSION_VERSION_CORE.equals((action))) {
             extensionVersion(callbackContext);
             return true;
-        }else if (action.equals("trackAdobeDeepLink")){
+        }else if (action.equals("getUrlVariables")) {
+            getUrlVariables(callbackContext);
+            return true;
+        } else if (action.equals("getIdentifiers")) {
+            getIdentifiers(callbackContext);
+            return true;
+        } else if (action.equals("trackAdobeDeepLink")){
         //    this.trackAdobeDeepLink(args,callbackContext);
             return true;
         }
@@ -478,6 +484,42 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
             public void run() {
                 PlacesMonitor.stop(true);
                 callbackContext.success();
+            }
+        });
+    }
+
+    private void getUrlVariables(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                Identity.getUrlVariables(new AdobeCallback<String>() {
+                    @Override
+                    public void call(String urlVariables) {
+                        callbackContext.success(urlVariables);
+                    }
+                });
+            }
+        });
+    }
+
+    private void getIdentifiers(final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                Identity.getIdentifiers(new AdobeCallback<List<VisitorID>>() {
+                    @Override
+                    public void call(List<VisitorID> ids) {
+                        String visitorIdsString = "";
+                        if (ids.isEmpty()) {
+                            visitorIdsString = "[]";
+                        } else {
+                            for (VisitorID id: ids) {
+                                visitorIdsString = visitorIdsString.concat(String.format("[Id: %s, Type: %s, Origin: %s, Authentication: %s] ", id.getId(), id.getIdType(), id.getIdOrigin(), id.getAuthenticationState().toString()));
+                            }
+                        }
+                        callbackContext.success(visitorIdsString);
+                    }
+                });
             }
         });
     }

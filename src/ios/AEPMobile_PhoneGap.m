@@ -508,6 +508,15 @@ static BOOL checkArgsWithTypes(NSArray* arguments, NSArray* types) {
     }];
 }
 
+- (void) getSdkIdentities:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        [ACPCore getSdkIdentities:^(NSString * _Nullable content) {
+            CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:content];
+            [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
+        }];
+    }];
+}
+
 - (void) getIdentifiers:(CDVInvokedUrlCommand*)command {
     [self.commandDelegate runInBackground:^{
         [ACPIdentity getIdentifiers:^(NSArray<ACPMobileVisitorId *> * _Nullable visitorIDs) {

@@ -20,7 +20,7 @@
 #import <CoreLocation/CoreLocation.h>
 #import "AEPMobile_PhoneGap.h"
 #import "AppDelegate.h"
-#import "ACPCore.h"
+#import <ACPCore/ACPCore.h>
 #import "ACPUserProfile.h"
 #import "ACPIdentity.h"
 #import "ACPLifecycle.h"
@@ -518,7 +518,7 @@ static BOOL checkArgsWithTypes(NSArray* arguments, NSArray* types) {
                 visitorIdsString = @"[]";
             } else {
                 for (ACPMobileVisitorId *visitorId in visitorIDs) {
-                    visitorIdsString = [visitorIdsString stringByAppendingFormat:@"[Id: %@, Type: %@, Origin: %@, Authentication: %@] ", [visitorId identifier], [visitorId idType], [visitorId idOrigin], stateStrings[(unsigned long)[visitorId authenticationState]]];
+                    // visitorIdsString = [visitorIdsString stringByAppendingFormat:@"[Id: %@, Type: %@, Origin: %@, Authentication: %@] ", [visitorId identifier], [visitorId idType], [visitorId idOrigin], stateStrings[(unsigned long)[visitorId authenticationState]]];
                 }
             }
             CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:visitorIdsString];

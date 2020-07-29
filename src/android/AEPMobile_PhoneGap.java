@@ -284,6 +284,9 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
         }else if (action.equals("getUrlVariables")) {
             getUrlVariables(callbackContext);
             return true;
+        }else if (action.equals("handleTracking")) {
+            handleTracking(args,callbackContext);
+            return true;
         } else if (action.equals("getIdentifiers")) {
             getIdentifiers(callbackContext);
             return true;
@@ -850,6 +853,49 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
             }
         }
         return jsonArray.toString();
+    }
+
+
+
+    private void handleTracking(final JSONArray args, final CallbackContext callbackContext) {
+        cordova.getThreadPool().execute(new Runnable() {
+            @Override
+            public void run() {
+                String deliveryId = null;
+                String broadlogId = null;
+
+                try {
+                    if (!args.get(0).equals(null) && args.get(0).getClass() == String.class) {
+                        deliveryId = args.getString(0);
+                        broadlogId = args.getString(1);
+                    } else if (!args.get(0).equals(null)) {
+
+                    }
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                    callbackContext.error(e.getMessage());
+                    return;
+                }
+
+                HashMap<String, Object> contextData = new HashMap<>();
+
+                if (deliveryId != null && broadlogId != null) {
+                    Log.d("deliveryId", deliveryId);
+                    contextData.put("deliveryId", deliveryId);
+                    contextData.put("broadlogId", broadlogId);
+
+                    // Send Click Tracking since the user did click on the notification
+                    contextData.put("action", "2");
+                    MobileCore.collectMessageInfo(contextData);
+
+                    // Send Open Tracking since the user opened the app
+                    contextData.put("action", "1");
+                    MobileCore.collectMessageInfo(contextData);
+                }
+
+            }
+        });
     }
 
 

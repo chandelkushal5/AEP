@@ -320,9 +320,10 @@ var AEP = (function () {
 	AEP.getUrlVariables = function(success, fail) {
 		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "getUrlVariables", []);
 	}
-	AEP.handleTracking = function(success, fail) {
-		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "handleTracking", [action,action]);
+	AEP.handleTracking = function(action,action1,success, fail) {
+		return cordova.exec(success, fail, "AEPMobile_PhoneGap", "handleTracking", [action,action1]);
 	}
+
 
 	return AEP;
 }());

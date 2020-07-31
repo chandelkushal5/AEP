@@ -881,7 +881,7 @@ public class AEPMobile_PhoneGap extends CordovaPlugin {
                 HashMap<String, Object> contextData = new HashMap<>();
 
                 if (deliveryId != null && broadlogId != null) {
-                    Log.d("deliveryId", deliveryId);
+                
                     contextData.put("deliveryId", deliveryId);
                     contextData.put("broadlogId", broadlogId);
 

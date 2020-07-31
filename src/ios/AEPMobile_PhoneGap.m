@@ -545,6 +545,37 @@ static BOOL checkArgsWithTypes(NSArray* arguments, NSArray* types) {
     }];
 }
 
+- (void)handleTracking:(CDVInvokedUrlCommand*)command {
+    [self.commandDelegate runInBackground:^{
+        if(!checkArgsWithTypes(command.arguments, @[@[STRING, STRING], @[STRING, DICTIONARY]])
+           || ([command.arguments[0] isKindOfClass:STRING] && command.arguments[1] != (id)[NSNull null])
+           || [command.arguments[1] isKindOfClass:STRING]) {
+            [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];
+            return;
+        }
+
+        id firstArg = getArg(command.arguments[0]);
+        id secondArg = getArg(command.arguments[1]);
+        
+
+        //allows the ADB.handleTracking() call
+            // Send Click Tracking since the user did click on the notification
+        [ACPCore collectMessageInfo:@{
+                                       @"broadlogId" : secondArg,
+                                       @"deliveryId": firstArg,
+                                       @"action": @"2"
+                                       }];
+        // Send Open Tracking since the user opened the app
+        [ACPCore collectMessageInfo:@{
+                                       @"broadlogId" : secondArg,
+                                       @"deliveryId": firstArg,
+                                       @"action": @"1"
+                                       }];
+
+        [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_OK] callbackId:command.callbackId];
+    }];
+}
+
 
 //- (void)getVersion:(CDVInvokedUrlCommand*)command {
 //	[self.commandDelegate runInBackground:^{

@@ -95,4 +95,5 @@ FOUNDATION_EXPORT NSString *const VisitorId_AuthenticationState;
 - (void) getIdentifiers:(CDVInvokedUrlCommand*)command;
 - (void) getUrlVariables:(CDVInvokedUrlCommand*)command;
 - (void) getSdkIdentities:(CDVInvokedUrlCommand*)command;
+- (void) handleTracking:(CDVInvokedUrlCommand*)command;
 @end

@@ -547,7 +547,7 @@ static BOOL checkArgsWithTypes(NSArray* arguments, NSArray* types) {
 
 - (void)handleTracking:(CDVInvokedUrlCommand*)command {
     [self.commandDelegate runInBackground:^{
-        if(!checkArgsWithTypes(command.arguments, @[@[STRING, STRING], @[STRING, DICTIONARY]])
+        if(!checkArgsWithTypes(command.arguments, @[@[STRING, STRING], @[STRING, STRING]])
            || ([command.arguments[0] isKindOfClass:STRING] && command.arguments[1] != (id)[NSNull null])
            || [command.arguments[1] isKindOfClass:STRING]) {
             [self.commandDelegate sendPluginResult:[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR] callbackId:command.callbackId];

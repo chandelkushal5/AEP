@@ -22,9 +22,9 @@
 #import "AppDelegate.h"
 #import <ACPCore/ACPCore.h>
 #import "ACPUserProfile.h"
-#import "ACPIdentity.h"
-#import "ACPLifecycle.h"
-#import "ACPSignal.h"
+#import <ACPCore/ACPLifecycle.h>
+#import <ACPCore/ACPSignal.h>
+//#import "ACPSignal.h"
 #import "ACPAnalytics.h"
 #import "ACPTarget.h"
 #import "ACPCampaign.h"
